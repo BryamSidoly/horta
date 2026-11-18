@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simulador - Horta Vertical Autônoma (Arduino & Tinkercad)</title>
+  <title>Simulador Horta Vertical Autônoma - Arduino, Relé, Kit Sensor & Tinkercad</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg-dark: #0a0f1d;
@@ -23,952 +23,115 @@
       --warning: #f97316;
       --text-main: #f1f5f9;
       --text-muted: #94a3b8;
-      --lcd-bg-on: #0284c7;
-      --lcd-bg-glow: rgba(2, 132, 199, 0.5);
-      --lcd-text-on: #e0f2fe;
-      --lcd-bg-off: #082f49;
-      --lcd-text-off: #0e3b5e;
+      --relay-blue: #0284c7;
+      --relay-active: #22c55e;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
     body {
       background-color: var(--bg-dark);
       color: var(--text-main);
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       min-height: 100vh;
-      overflow-x: hidden;
       display: flex;
       flex-direction: column;
+      overflow-x: hidden;
     }
 
-    /* TOP BAR */
+    /* TOP HEADER */
     header {
       background: linear-gradient(180deg, #162035 0%, #0d1424 100%);
       border-bottom: 1px solid var(--border-color);
-      padding: 12px 24px;
+      padding: 10px 20px;
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
       position: sticky;
       top: 0;
-      z-index: 50;
+      z-index: 60;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
     }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
+    .brand { display: flex; align-items: center; gap: 10px; }
     .brand-icon {
-      width: 42px;
-      height: 42px;
+      width: 40px; height: 40px;
       background: linear-gradient(135deg, #10b981 0%, #047857 100%);
       border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
       box-shadow: 0 0 15px var(--primary-glow);
     }
 
     .brand-text h1 {
-      font-size: 1.15rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      font-size: 1.1rem; font-weight: 700; color: #fff;
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
     }
-
-    .brand-text p {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-    }
+    .brand-text p { font-size: 0.72rem; color: var(--text-muted); }
 
     .badge-fw {
       background: rgba(16, 185, 129, 0.15);
       border: 1px solid rgba(16, 185, 129, 0.4);
-      color: #34d399;
-      font-size: 0.7rem;
-      padding: 2px 6px;
-      border-radius: 4px;
+      color: #34d399; font-size: 0.68rem;
+      padding: 2px 6px; border-radius: 4px;
       font-family: 'Share Tech Mono', monospace;
     }
 
     .sim-controls {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
     }
 
     .sim-clock-card {
       background: #090e1a;
       border: 1px solid var(--border-color);
       border-radius: 8px;
-      padding: 6px 14px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
+      padding: 5px 12px;
+      display: flex; align-items: center; gap: 10px;
       font-family: 'Share Tech Mono', monospace;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
     }
-
-    .sim-time-val {
-      color: var(--accent);
-      font-weight: 600;
-      min-width: 95px;
-    }
+    .sim-time-val { color: var(--accent); font-weight: 600; min-width: 80px; }
 
     .speed-btn-group {
-      display: flex;
-      background: #090e1a;
+      display: flex; background: #090e1a;
       border: 1px solid var(--border-color);
-      border-radius: 8px;
-      overflow: hidden;
+      border-radius: 8px; overflow: hidden;
     }
 
     .btn-speed {
-      background: transparent;
-      border: none;
+      background: transparent; border: none;
       color: var(--text-muted);
-      padding: 6px 11px;
-      font-size: 0.75rem;
+      padding: 5px 10px; font-size: 0.72rem;
       font-family: 'Share Tech Mono', monospace;
-      cursor: pointer;
-      transition: all 0.15s;
+      cursor: pointer; transition: all 0.15s;
     }
-
-    .btn-speed:hover {
-      background: var(--bg-card-hover);
-      color: #fff;
-    }
-
+    .btn-speed:hover { background: var(--bg-card-hover); color: #fff; }
     .btn-speed.active {
-      background: var(--accent);
-      color: #000;
-      font-weight: 700;
+      background: var(--accent); color: #000; font-weight: 700;
       box-shadow: 0 0 10px var(--accent-glow);
     }
 
-    .header-actions {
-      display: flex;
-      gap: 8px;
-    }
-
     .btn-tool {
-      background: #1e293b;
-      border: 1px solid var(--border-color);
-      color: var(--text-main);
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 0.78rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      background: #1e293b; border: 1px solid var(--border-color);
+      color: var(--text-main); padding: 5px 10px; border-radius: 6px;
+      font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 6px;
       transition: all 0.2s;
     }
+    .btn-tool:hover { background: #334155; border-color: #64748b; }
+    .btn-tool.active-sound { border-color: var(--primary); color: var(--primary); }
 
-    .btn-tool:hover {
-      background: #334155;
-      border-color: #475569;
-    }
-
-    .btn-tool.active-sound {
-      border-color: var(--primary);
-      color: var(--primary);
-    }
-
-    /* MAIN CONTAINER GRID */
-    main {
-      flex: 1;
-      padding: 16px 20px;
-      display: grid;
-      grid-template-columns: 380px 1fr 340px;
-      gap: 16px;
-      max-width: 1920px;
-      margin: 0 auto;
-      width: 100%;
-    }
-
-    @media (max-width: 1400px) {
-      main {
-        grid-template-columns: 360px 1fr;
-      }
-      .col-power {
-        grid-column: span 2;
-      }
-    }
-
-    @media (max-width: 950px) {
-      main {
-        grid-template-columns: 1fr;
-      }
-      .col-power {
-        grid-column: span 1;
-      }
-    }
-
-    .column {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    /* CARD STYLING */
-    .card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 16px;
-      position: relative;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-    }
-
-    .card-title {
-      font-size: 0.82rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--text-muted);
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .card-title-icon {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    /* ARDUINO 16X2 LCD */
-    .lcd-enclosure {
-      background: #111827;
-      border: 2px solid #374151;
-      border-radius: 12px;
-      padding: 16px;
-      box-shadow: inset 0 2px 10px rgba(0,0,0,0.8), 0 8px 24px rgba(0,0,0,0.4);
-    }
-
-    .lcd-bezel {
-      background: #030712;
-      border: 4px solid #1f2937;
-      border-radius: 8px;
-      padding: 14px 18px;
-      position: relative;
-      box-shadow: inset 0 0 15px rgba(0,0,0,0.9);
-    }
-
-    .lcd-screen {
-      font-family: 'Share Tech Mono', monospace;
-      letter-spacing: 2px;
-      font-size: 1.25rem;
-      line-height: 1.5;
-      padding: 10px 14px;
-      border-radius: 4px;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-      text-shadow: 0 0 4px rgba(255, 255, 255, 0.6);
-    }
-
-    .lcd-screen::before {
-      content: "";
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 60%);
-      pointer-events: none;
-    }
-
-    .lcd-screen.backlight-on {
-      background: var(--lcd-bg-on);
-      color: var(--lcd-text-on);
-      box-shadow: 0 0 25px var(--lcd-bg-glow), inset 0 0 12px rgba(0,0,0,0.4);
-    }
-
-    .lcd-screen.backlight-off {
-      background: var(--lcd-bg-off);
-      color: var(--lcd-text-off);
-      text-shadow: none;
-      box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
-    }
-
-    .lcd-line {
-      white-space: pre;
-      font-weight: 700;
-      min-height: 1.5em;
-    }
-
-    .lcd-meta {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 10px;
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      font-family: 'Share Tech Mono', monospace;
-    }
-
-    .lcd-badge {
-      display: inline-block;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 0.65rem;
-      font-weight: 600;
-    }
-
-    .badge-on { background: #065f46; color: #34d399; }
-    .badge-off { background: #450a0a; color: #f87171; }
-    .badge-edit { background: #7c2d12; color: #fdba74; animation: blink 1s infinite; }
-
-    @keyframes blink {
-      50% { opacity: 0.4; }
-    }
-
-    /* TACTILE PUSHBUTTON SECTION */
-    .button-control-card {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 14px;
-      padding: 16px;
-      background: #0b1120;
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-    }
-
-    .tactile-button-wrap {
-      position: relative;
-      width: 110px;
-      height: 110px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .btn-svg-ring {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      transform: rotate(-90deg);
-      pointer-events: none;
-    }
-
-    .btn-ring-bg {
-      fill: none;
-      stroke: #1e293b;
-      stroke-width: 6;
-    }
-
-    .btn-ring-progress {
-      fill: none;
-      stroke: var(--accent);
-      stroke-width: 6;
-      stroke-linecap: round;
-      stroke-dasharray: 301.6;
-      stroke-dashoffset: 301.6;
-      transition: stroke-dashoffset 0.05s linear;
-    }
-
-    .btn-ring-progress.ready-long {
-      stroke: var(--solar);
-      filter: drop-shadow(0 0 6px var(--solar-glow));
-    }
-
-    .tactile-button {
-      width: 82px;
-      height: 82px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #374151 0%, #111827 80%);
-      border: 3px solid #4b5563;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.6), inset 0 2px 4px rgba(255,255,255,0.2);
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: #e5e7eb;
-      font-size: 0.72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      transition: all 0.08s ease;
-      outline: none;
-    }
-
-    .tactile-button:active, .tactile-button.pressed {
-      transform: translateY(3px) scale(0.97);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.8), inset 0 3px 6px rgba(0,0,0,0.6);
-      background: radial-gradient(circle at 50% 50%, #1f2937 0%, #030712 90%);
-      border-color: var(--accent);
-    }
-
-    .btn-hold-label {
-      font-size: 0.7rem;
-      font-family: 'Share Tech Mono', monospace;
-      color: var(--text-muted);
-      text-align: center;
-    }
-
-    .btn-quick-actions {
-      display: flex;
-      gap: 8px;
-      width: 100%;
-    }
-
-    .btn-quick {
-      flex: 1;
-      padding: 8px 10px;
-      background: #1e293b;
-      border: 1px solid var(--border-color);
-      color: var(--text-main);
-      border-radius: 6px;
-      font-size: 0.75rem;
-      cursor: pointer;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: all 0.15s;
-    }
-
-    .btn-quick:hover {
-      background: #334155;
-      border-color: #64748b;
-    }
-
-    /* ARDUINO UNO HARDWARE PINOUT / LEDS */
-    .arduino-status-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
-      font-size: 0.75rem;
-      font-family: 'Share Tech Mono', monospace;
-    }
-
-    .pin-status-pill {
-      background: #090e1a;
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      padding: 6px 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .pin-led {
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      background: #374151;
-      display: inline-block;
-      transition: all 0.2s;
-    }
-
-    .pin-led.led-green.active { background: #10b981; box-shadow: 0 0 8px #10b981; }
-    .pin-led.led-red.active { background: #ef4444; box-shadow: 0 0 8px #ef4444; }
-    .pin-led.led-yellow.active { background: #f59e0b; box-shadow: 0 0 8px #f59e0b; }
-    .pin-led.led-blue.active { background: #06b6d4; box-shadow: 0 0 8px #06b6d4; }
-
-    /* SERIAL MONITOR */
-    .serial-card {
-      background: #050811;
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .serial-header {
-      background: #0e1526;
+    /* NAVIGATION TABS BAR */
+    .nav-tabs {
+      background: #0f172a;
       border-bottom: 1px solid var(--border-color);
-      padding: 6px 12px;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.72rem;
-      font-family: 'Share Tech Mono', monospace;
-      color: var(--text-muted);
-    }
-
-    .serial-output {
-      height: 160px;
-      overflow-y: auto;
-      padding: 10px;
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.73rem;
-      line-height: 1.45;
-      color: #38bdf8;
-      background: #050811;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .serial-log-line {
-      margin-bottom: 3px;
-      word-break: break-all;
-    }
-
-    .serial-log-line.warn { color: #f59e0b; }
-    .serial-log-line.error { color: #f87171; }
-    .serial-log-line.success { color: #4ade80; }
-
-    /* PHYSICAL VERTICAL GARDEN (PALLETS) */
-    .garden-scene {
-      background: radial-gradient(circle at 50% 30%, #2a3447 0%, #111827 80%);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 18px;
-      position: relative;
-      overflow: hidden;
-      min-height: 480px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    /* Ambient Day/Night overlay */
-    .day-night-veil {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      pointer-events: none;
-      transition: background 1s ease;
-      z-index: 1;
-    }
-
-    .garden-header {
-      position: relative;
-      z-index: 2;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(15, 23, 42, 0.75);
-      backdrop-filter: blur(8px);
-      padding: 8px 14px;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      font-size: 0.75rem;
-    }
-
-    .hydraulics-bar {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .valve-indicator {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-weight: 700;
-      font-family: 'Share Tech Mono', monospace;
-    }
-
-    .valve-icon {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: #475569;
-      box-shadow: 0 0 5px rgba(0,0,0,0.5);
-    }
-
-    .valve-open .valve-icon {
-      background: #10b981;
-      box-shadow: 0 0 12px #10b981;
-      animation: pulse 1s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.6; }
-    }
-
-    /* PALLET WALL GRAPHICS (3 Wooden Pallets based on Photos) */
-    .pallets-container {
-      position: relative;
-      z-index: 2;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-      margin: 16px 0;
-      align-items: end;
-    }
-
-    .pallet-frame {
-      background: #78350f;
-      background: linear-gradient(180deg, #92400e 0%, #78350f 100%);
-      border: 3px solid #451a03;
-      border-radius: 6px;
-      padding: 8px 6px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.15);
-      position: relative;
-    }
-
-    /* Center pallet mounted slightly higher on wall as in photo */
-    .pallet-center {
-      transform: translateY(-16px);
-      border-color: #b45309;
-      box-shadow: 0 12px 28px rgba(0,0,0,0.6);
-    }
-
-    .pallet-title {
-      font-size: 0.68rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: #fde68a;
-      text-align: center;
-      background: rgba(0, 0, 0, 0.4);
-      padding: 3px 4px;
-      border-radius: 4px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .shelf-box {
-      background: #451a03;
-      border: 2px solid #291002;
-      border-radius: 4px;
-      padding: 6px;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      min-height: 85px;
-      overflow: hidden;
-    }
-
-    /* Plants & Foliage representation */
-    .plant-foliage {
-      position: absolute;
-      top: 4px;
-      left: 6px;
-      right: 6px;
-      height: 52px;
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-around;
-      pointer-events: none;
-      z-index: 3;
-    }
-
-    .leaf-bunch {
-      font-size: 24px;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
-      transition: all 0.5s ease;
-    }
-
-    .leaf-hanging {
-      position: absolute;
-      bottom: -18px;
-      font-size: 18px;
-      opacity: 0.85;
-      animation: sway 3s ease-in-out infinite alternate;
-    }
-
-    @keyframes sway {
-      0% { transform: rotate(-3deg); }
-      100% { transform: rotate(3deg); }
-    }
-
-    /* Soil layer in planter box */
-    .soil-layer {
-      height: 28px;
-      background: #3e2723;
-      border-radius: 3px;
-      position: relative;
-      overflow: hidden;
-      transition: background 0.5s ease;
-      box-shadow: inset 0 3px 6px rgba(0,0,0,0.6);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .soil-moisture-indicator {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 100%;
-      background: linear-gradient(180deg, #1b0f0a 0%, #0d0705 100%);
-      opacity: 0.3;
-      transition: opacity 0.5s ease;
-    }
-
-    /* Reference Soil Sensor Pin */
-    .sensor-probe {
-      position: absolute;
-      top: -12px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 14px;
-      height: 38px;
-      background: #0f172a;
-      border: 1.5px solid #06b6d4;
-      border-radius: 2px;
-      z-index: 5;
-      box-shadow: 0 0 8px rgba(6, 182, 212, 0.4);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .sensor-probe-wire {
-      position: absolute;
-      bottom: 100%;
-      left: 50%;
-      width: 2px;
-      height: 24px;
-      background: #06b6d4;
-    }
-
-    /* Dripper line and falling drops */
-    .dripper-pipe {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: #1e293b;
-      border-bottom: 1px solid #38bdf8;
-      z-index: 4;
-    }
-
-    .water-drop {
-      position: absolute;
-      top: 4px;
-      width: 4px;
-      height: 8px;
-      background: #38bdf8;
-      border-radius: 50%;
-      opacity: 0;
-    }
-
-    .valve-open .water-drop {
-      animation: drip 0.7s linear infinite;
-    }
-
-    .drop-1 { left: 25%; animation-delay: 0.1s !important; }
-    .drop-2 { left: 50%; animation-delay: 0.35s !important; }
-    .drop-3 { left: 75%; animation-delay: 0.55s !important; }
-
-    @keyframes drip {
-      0% { top: 4px; opacity: 1; transform: scale(0.8); }
-      70% { opacity: 0.9; }
-      100% { top: 48px; opacity: 0; transform: scale(1.3); }
-    }
-
-    /* Hydraulic stats footer */
-    .garden-footer {
-      position: relative;
-      z-index: 2;
-      background: rgba(15, 23, 42, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 8px;
-      padding: 8px 14px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      font-size: 0.72rem;
-      font-family: 'Share Tech Mono', monospace;
-    }
-
-    .garden-stat {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .stat-label { color: var(--text-muted); font-size: 0.65rem; }
-    .stat-val { color: #fff; font-weight: 700; }
-
-    /* POWER & SOLAR SYSTEM COLUMN */
-    .power-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .solar-panel-card {
-      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-      border: 1px solid #334155;
-      border-radius: 10px;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .solar-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-
-    .solar-visual {
-      height: 60px;
-      background: #020617;
-      border: 1px solid #1e293b;
-      border-radius: 6px;
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .solar-cells-grid {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-image: linear-gradient(#1e3a8a 1px, transparent 1px),
-                        linear-gradient(90deg, #1e3a8a 1px, transparent 1px);
-      background-size: 20px 20px;
-      opacity: 0.4;
-    }
-
-    .sun-orb {
-      position: absolute;
-      width: 32px;
-      height: 32px;
-      background: radial-gradient(circle, #fde047 0%, #f59e0b 80%);
-      border-radius: 50%;
-      box-shadow: 0 0 20px #f59e0b;
-      transition: all 0.5s ease;
-    }
-
-    .sun-slider-wrap {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.72rem;
-      color: var(--text-muted);
-    }
-
-    input[type="range"] {
-      flex: 1;
-      accent-color: var(--accent);
-      cursor: pointer;
-    }
-
-    /* SUN21 CHARGE CONTROLLER REPLICA */
-    .sun21-card {
-      background: #0f172a;
-      border: 2px solid #2563eb;
-      border-radius: 10px;
-      padding: 12px;
-      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.15);
-    }
-
-    .sun21-screen {
-      background: #60a5fa;
-      color: #030712;
-      font-family: 'Share Tech Mono', monospace;
-      padding: 8px 10px;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: inset 0 0 8px rgba(0,0,0,0.3);
-      margin-bottom: 8px;
-    }
-
-    .sun21-leds {
-      display: flex;
-      justify-content: space-around;
-      font-size: 0.65rem;
-      color: var(--text-muted);
-    }
-
-    .sun21-led-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      padding: 0 20px;
       gap: 4px;
-    }
-
-    /* BATTERY 12V 9Ah */
-    .battery-card {
-      background: #0f172a;
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .battery-meter-wrap {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .battery-shell {
-      flex: 1;
-      height: 22px;
-      background: #1e293b;
-      border: 2px solid #475569;
-      border-radius: 5px;
-      padding: 2px;
-      position: relative;
-    }
-
-    .battery-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #ef4444 0%, #f59e0b 35%, #10b981 100%);
-      border-radius: 2px;
-      transition: width 0.3s ease;
-    }
-
-    .battery-nipple {
-      width: 4px;
-      height: 10px;
-      background: #475569;
-      border-radius: 0 2px 2px 0;
-    }
-
-    /* BOTTOM TABS SECTION */
-    .bottom-section {
-      max-width: 1920px;
-      margin: 0 auto;
-      width: 100%;
-      padding: 0 20px 24px;
-    }
-
-    .tabs-header {
-      display: flex;
-      gap: 4px;
-      border-bottom: 1px solid var(--border-color);
-      margin-bottom: 16px;
       overflow-x: auto;
     }
 
-    .tab-btn {
+    .main-tab-btn {
       background: transparent;
       border: none;
       color: var(--text-muted);
@@ -979,27 +142,25 @@
       border-bottom: 2px solid transparent;
       transition: all 0.2s;
       white-space: nowrap;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      display: flex; align-items: center; gap: 8px;
     }
-
-    .tab-btn:hover {
-      color: #fff;
-      background: rgba(255, 255, 255, 0.03);
-    }
-
-    .tab-btn.active {
+    .main-tab-btn:hover { color: #fff; background: rgba(255, 255, 255, 0.04); }
+    .main-tab-btn.active {
       color: var(--accent);
       border-bottom-color: var(--accent);
-      background: rgba(6, 182, 212, 0.06);
+      background: rgba(6, 182, 212, 0.08);
     }
 
-    .tab-content {
+    /* VIEWS CONTAINER */
+    .view-content {
       display: none;
+      flex: 1;
+      padding: 16px 20px;
+      width: 100%;
+      max-width: 1920px;
+      margin: 0 auto;
     }
-
-    .tab-content.active {
+    .view-content.active {
       display: block;
       animation: fadeIn 0.2s ease;
     }
@@ -1009,151 +170,350 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* SCENARIOS BUTTONS GRID */
-    .scenarios-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 12px;
-    }
-
-    .scenario-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 12px 14px;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .scenario-card:hover {
-      border-color: var(--accent);
-      background: var(--bg-card-hover);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    }
-
-    .scenario-name {
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .scenario-desc {
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      line-height: 1.35;
-    }
-
-    /* SCHEMATIC & WIRING TABLE */
-    .wiring-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.78rem;
-    }
-
-    .wiring-table th, .wiring-table td {
-      border: 1px solid var(--border-color);
-      padding: 8px 12px;
-      text-align: left;
-    }
-
-    .wiring-table th {
-      background: #0f172a;
-      color: var(--accent);
-      font-family: 'Share Tech Mono', monospace;
-    }
-
-    .wiring-table tr:nth-child(even) {
-      background: rgba(255, 255, 255, 0.02);
-    }
-
-    /* MODAL FOR PHOTOS */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(8px);
-      z-index: 100;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-    }
-
-    .modal-overlay.open {
-      display: flex;
-    }
-
-    .modal-card {
+    /* CARDS & GENERAL LAYOUT */
+    .card {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 12px;
-      max-width: 900px;
-      width: 100%;
-      max-height: 90vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+      padding: 16px;
+      position: relative;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+    .card-title {
+      font-size: 0.82rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      color: var(--text-muted); margin-bottom: 12px;
+      display: flex; align-items: center; justify-content: space-between;
     }
 
-    .modal-header {
-      padding: 14px 20px;
-      background: #0f172a;
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .modal-body {
-      padding: 20px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .modal-close {
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      font-size: 1.4rem;
-      cursor: pointer;
-    }
-
-    .img-preview-grid {
+    /* GRID FOR MAIN GARDEN VIEW */
+    .garden-view-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 480px 1fr 340px;
       gap: 16px;
     }
+    @media (max-width: 1450px) {
+      .garden-view-grid { grid-template-columns: 440px 1fr; }
+      .col-power-garden { grid-column: span 2; }
+    }
+    @media (max-width: 1000px) {
+      .garden-view-grid { grid-template-columns: 1fr; }
+      .col-power-garden { grid-column: span 1; }
+    }
 
-    .img-card {
-      background: #090e1a;
-      border: 1px solid var(--border-color);
+    /* LCD 16X2 PIXEL CANVAS ENCLOSURE */
+    .lcd-enclosure-box {
+      background: #111827;
+      border: 3px solid #374151;
+      border-radius: 12px;
+      padding: 14px;
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.8), 0 8px 24px rgba(0,0,0,0.5);
+    }
+    .lcd-bezel-box {
+      background: #030712;
+      border: 4px solid #1f2937;
       border-radius: 8px;
-      overflow: hidden;
+      padding: 10px;
       display: flex;
       flex-direction: column;
+      align-items: center;
+      position: relative;
+      box-shadow: inset 0 0 15px rgba(0,0,0,0.9);
     }
-
-    .img-card img {
+    .lcd-canvas-wrap {
       width: 100%;
-      height: 280px;
-      object-fit: cover;
+      overflow-x: auto;
+      display: flex;
+      justify-content: center;
+      background: #021a2e;
+      border-radius: 4px;
+      box-shadow: inset 0 0 12px rgba(0,0,0,0.6);
+      transition: background 0.3s;
+    }
+    .lcd-canvas-wrap.backlight-on {
+      background: #0284c7;
+      box-shadow: 0 0 25px rgba(2, 132, 199, 0.4), inset 0 0 12px rgba(0,0,0,0.4);
+    }
+    .lcd-canvas-wrap.backlight-off {
+      background: #04121d;
+      box-shadow: inset 0 0 15px rgba(0,0,0,0.9);
+    }
+    #lcdCanvas {
+      display: block;
+      image-rendering: pixelated;
+    }
+    .lcd-meta-bar {
+      display: flex; justify-content: space-between;
+      width: 100%; margin-top: 8px; font-size: 0.72rem;
+      color: var(--text-muted); font-family: 'Share Tech Mono', monospace;
+    }
+    .lcd-badge {
+      display: inline-block; padding: 2px 6px; border-radius: 4px;
+      font-size: 0.65rem; font-weight: 600;
+    }
+    .badge-on { background: #065f46; color: #34d399; }
+    .badge-off { background: #450a0a; color: #f87171; }
+    .badge-edit { background: #7c2d12; color: #fdba74; animation: blink 1s infinite; }
+    @keyframes blink { 50% { opacity: 0.4; } }
+
+    /* BUTTON CONTROL */
+    .button-control-card {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 12px; padding: 14px; background: #0b1120;
+      border: 1px solid var(--border-color); border-radius: 12px;
+    }
+    .tactile-button-wrap {
+      position: relative; width: 100px; height: 100px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .btn-svg-ring {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      transform: rotate(-90deg); pointer-events: none;
+    }
+    .btn-ring-bg { fill: none; stroke: #1e293b; stroke-width: 6; }
+    .btn-ring-progress {
+      fill: none; stroke: var(--accent); stroke-width: 6; stroke-linecap: round;
+      stroke-dasharray: 276.4; stroke-dashoffset: 276.4;
+      transition: stroke-dashoffset 0.05s linear;
+    }
+    .btn-ring-progress.ready-long {
+      stroke: var(--solar); filter: drop-shadow(0 0 6px var(--solar-glow));
+    }
+    .tactile-button {
+      width: 74px; height: 74px; border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #374151 0%, #111827 80%);
+      border: 3px solid #4b5563;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.6), inset 0 2px 4px rgba(255,255,255,0.2);
+      cursor: pointer; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      color: #e5e7eb; font-size: 0.7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      transition: all 0.08s ease; outline: none;
+    }
+    .tactile-button:active, .tactile-button.pressed {
+      transform: translateY(3px) scale(0.97);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.8), inset 0 3px 6px rgba(0,0,0,0.6);
+      background: radial-gradient(circle at 50% 50%, #1f2937 0%, #030712 90%);
+      border-color: var(--accent);
     }
 
-    .img-card p {
-      padding: 8px 12px;
-      font-size: 0.75rem;
-      color: var(--text-muted);
+    /* HARDWARE PINOUT STATUS GRID */
+    .arduino-status-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px;
+      font-size: 0.73rem; font-family: 'Share Tech Mono', monospace;
     }
+    .pin-status-pill {
+      background: #090e1a; border: 1px solid var(--border-color);
+      border-radius: 6px; padding: 5px 8px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .pin-led {
+      width: 9px; height: 9px; border-radius: 50%;
+      background: #374151; display: inline-block; transition: all 0.2s;
+    }
+    .pin-led.led-green.active { background: #10b981; box-shadow: 0 0 8px #10b981; }
+    .pin-led.led-red.active { background: #ef4444; box-shadow: 0 0 8px #ef4444; }
+    .pin-led.led-yellow.active { background: #f59e0b; box-shadow: 0 0 8px #f59e0b; }
+    .pin-led.led-blue.active { background: #06b6d4; box-shadow: 0 0 8px #06b6d4; }
+
+    /* RELAY MODULE STATUS CARD */
+    .relay-module-box {
+      background: #0c1427; border: 2px solid var(--relay-blue);
+      border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 6px;
+    }
+    .relay-header {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.75rem; font-weight: 700; color: #38bdf8;
+    }
+    .relay-visual-diagram {
+      display: flex; align-items: center; justify-content: space-around;
+      background: #070d1a; border: 1px solid #1e293b; border-radius: 6px;
+      padding: 6px; font-size: 0.7rem; font-family: 'Share Tech Mono', monospace;
+    }
+    .relay-contact-state { font-weight: 700; transition: color 0.2s; }
+
+    /* 3 PALLETS WALL VIEW */
+    .garden-scene {
+      background: radial-gradient(circle at 50% 30%, #2a3447 0%, #111827 80%);
+      border: 1px solid var(--border-color); border-radius: 12px;
+      padding: 16px; position: relative; overflow: hidden;
+      display: flex; flex-direction: column; justify-content: space-between;
+      min-height: 520px;
+    }
+    .pallets-container {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+      margin: 14px 0; align-items: end; position: relative; z-index: 2;
+    }
+    .pallet-frame {
+      background: linear-gradient(180deg, #92400e 0%, #78350f 100%);
+      border: 3px solid #451a03; border-radius: 6px; padding: 6px;
+      display: flex; flex-direction: column; gap: 10px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    }
+    .pallet-center { transform: translateY(-16px); border-color: #b45309; }
+    .pallet-title-badge {
+      font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+      color: #fde68a; text-align: center; background: rgba(0,0,0,0.4);
+      padding: 3px; border-radius: 4px; display: flex; justify-content: space-between;
+    }
+    .shelf-box {
+      background: #451a03; border: 2px solid #291002; border-radius: 4px;
+      padding: 6px; position: relative; display: flex; flex-direction: column;
+      justify-content: flex-end; min-height: 90px; overflow: hidden;
+    }
+    .plant-foliage-wrap {
+      position: absolute; top: 4px; left: 4px; right: 4px; height: 55px;
+      display: flex; align-items: flex-end; justify-content: space-around;
+      pointer-events: none; z-index: 3;
+    }
+    .leaf-bunch { font-size: 26px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4)); }
+    .leaf-hanging {
+      position: absolute; bottom: -18px; font-size: 18px; opacity: 0.85;
+      animation: sway 3s ease-in-out infinite alternate;
+    }
+    @keyframes sway { 0% { transform: rotate(-3deg); } 100% { transform: rotate(3deg); } }
+
+    .soil-layer {
+      height: 28px; background: #3e2723; border-radius: 3px;
+      position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;
+      box-shadow: inset 0 3px 6px rgba(0,0,0,0.6);
+    }
+    .soil-moisture-indicator {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 100%;
+      background: linear-gradient(180deg, #1b0f0a 0%, #0d0705 100%);
+      opacity: 0.3; transition: opacity 0.5s ease;
+    }
+
+    /* DRIPPER PIPES & DROPS */
+    .dripper-pipe {
+      position: absolute; top: 0; left: 0; right: 0; height: 4px;
+      background: #1e293b; border-bottom: 1px solid #38bdf8; z-index: 4;
+    }
+    .water-drop {
+      position: absolute; top: 4px; width: 4px; height: 8px;
+      background: #38bdf8; border-radius: 50%; opacity: 0;
+    }
+    .valve-open .water-drop { animation: drip 0.7s linear infinite; }
+    .drop-1 { left: 25%; animation-delay: 0.1s !important; }
+    .drop-2 { left: 50%; animation-delay: 0.35s !important; }
+    .drop-3 { left: 75%; animation-delay: 0.55s !important; }
+    @keyframes drip {
+      0% { top: 4px; opacity: 1; transform: scale(0.8); }
+      70% { opacity: 0.9; }
+      100% { top: 52px; opacity: 0; transform: scale(1.3); }
+    }
+
+    /* SENSOR PROBE */
+    .sensor-probe {
+      position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+      width: 14px; height: 40px; background: #0f172a;
+      border: 1.5px solid #06b6d4; border-radius: 2px; z-index: 5;
+      display: flex; flex-direction: column; align-items: center;
+      box-shadow: 0 0 8px rgba(6, 182, 212, 0.4);
+    }
+    .sensor-probe-wire {
+      position: absolute; bottom: 100%; left: 50%; width: 2px; height: 26px;
+      background: #06b6d4;
+    }
+
+    /* CODE SIMULATOR TAB (TINKERCAD IDE) */
+    .code-editor-layout {
+      display: grid; grid-template-columns: 1fr 340px; gap: 16px;
+      height: calc(100vh - 170px); min-height: 580px;
+    }
+    .code-editor-container {
+      background: #0d1117; border: 1px solid var(--border-color);
+      border-radius: 10px; display: flex; flex-direction: column; overflow: hidden;
+    }
+    .code-toolbar {
+      background: #161b22; border-bottom: 1px solid var(--border-color);
+      padding: 8px 14px; display: flex; justify-content: space-between; align-items: center;
+      gap: 10px; flex-wrap: wrap;
+    }
+    .code-editor-inner {
+      flex: 1; display: flex; position: relative; overflow: hidden;
+    }
+    .code-line-numbers {
+      width: 48px; background: #0d1117; border-right: 1px solid #21262d;
+      color: #484f58; font-family: 'Fira Code', monospace; font-size: 0.8rem;
+      padding: 10px 0; text-align: right; user-select: none; line-height: 1.5;
+      overflow: hidden;
+    }
+    .code-textarea {
+      flex: 1; background: transparent; border: none; outline: none;
+      color: #c9d1d9; font-family: 'Fira Code', monospace; font-size: 0.8rem;
+      line-height: 1.5; padding: 10px; resize: none; white-space: pre;
+      tab-size: 2; overflow: auto;
+    }
+    .compiler-output-box {
+      height: 130px; background: #090d16; border-top: 1px solid var(--border-color);
+      padding: 8px 12px; font-family: 'Fira Code', monospace; font-size: 0.72rem;
+      color: #58a6ff; overflow-y: auto; line-height: 1.4;
+    }
+
+    /* MODULAR HYDRAULICS & 9-SHELVES CUSTOMIZER */
+    .shelf-customizer-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+    }
+    .pallet-config-card {
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 12px;
+    }
+    .shelf-item-card {
+      background: #090e1a; border: 1px solid var(--border-color);
+      border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 6px;
+    }
+    .shelf-item-header {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.75rem; font-weight: 700;
+    }
+
+    /* INTERACTIVE FUNCTIONAL SCHEMATIC */
+    .schematic-canvas-container {
+      background: #080d1a; border: 1px solid var(--border-color);
+      border-radius: 12px; padding: 20px; overflow-x: auto; position: relative;
+    }
+    .schematic-svg {
+      width: 100%; min-width: 900px; height: 560px;
+    }
+    .schematic-wire {
+      fill: none; stroke-width: 3; stroke-linecap: round;
+      transition: stroke 0.3s;
+    }
+    .wire-power { stroke: #ef4444; }
+    .wire-gnd { stroke: #475569; }
+    .wire-12v { stroke: #eab308; }
+    .wire-signal { stroke: #06b6d4; }
+    .wire-active {
+      stroke-dasharray: 8 6;
+      animation: dash 1s linear infinite;
+    }
+    @keyframes dash {
+      to { stroke-dashoffset: -28; }
+    }
+    .comp-box {
+      cursor: pointer; transition: transform 0.15s;
+    }
+    .comp-box:hover {
+      filter: drop-shadow(0 0 10px rgba(6, 182, 212, 0.4));
+    }
+    .schematic-explainer-card {
+      background: #111a2e; border: 1px solid var(--accent);
+      border-radius: 8px; padding: 12px 16px; margin-top: 14px;
+      font-size: 0.8rem; line-height: 1.5;
+    }
+
+    /* SERIAL MONITOR */
+    .serial-output {
+      height: 150px; overflow-y: auto; padding: 8px 10px;
+      font-family: 'Share Tech Mono', monospace; font-size: 0.73rem;
+      line-height: 1.45; color: #38bdf8; background: #050811;
+      border-radius: 6px;
+    }
+    .serial-log-line { margin-bottom: 2px; }
+    .serial-log-line.warn { color: #f59e0b; }
+    .serial-log-line.error { color: #f87171; }
+    .serial-log-line.success { color: #4ade80; }
   </style>
 </head>
 <body>
@@ -1166,15 +526,16 @@
         <h1>
           Horta Vertical Autônoma
           <span class="badge-fw">Arduino Uno R3</span>
+          <span class="badge-fw" style="color:#60a5fa;border-color:#3b82f6;">Módulo Relé 5V</span>
+          <span class="badge-fw" style="color:#fbbf24;border-color:#f59e0b;">Sensor Kit LM393</span>
         </h1>
-        <p>Simulador Dinâmico • Tinkercad & Hardware Real • Controlador SUN21 PWM</p>
+        <p>Simulador Completo • Bancada & Tinkercad • LCD Matriz 5x8 Pixels • Hidráulica Modular</p>
       </div>
     </div>
 
-    <!-- SIMULATION CLOCK CONTROLS -->
     <div class="sim-controls">
       <div class="sim-clock-card">
-        <span style="color:var(--text-muted)">SIMULADO:</span>
+        <span style="color:var(--text-muted)">HORA:</span>
         <span id="simClockTime" class="sim-time-val">00:00:00</span>
         <span id="simDayCount" style="color:var(--text-muted);font-size:0.75rem;">Dia 1</span>
       </div>
@@ -1182,701 +543,1082 @@
       <div class="speed-btn-group">
         <button class="btn-speed" onclick="setSpeed(0)" id="spd0" title="Pausar">⏸️</button>
         <button class="btn-speed active" onclick="setSpeed(1)" id="spd1" title="Tempo Real">1x</button>
-        <button class="btn-speed" onclick="setSpeed(10)" id="spd10" title="10x mais rápido">10x</button>
-        <button class="btn-speed" onclick="setSpeed(60)" id="spd60" title="1 minuto por segundo">60x</button>
-        <button class="btn-speed" onclick="setSpeed(300)" id="spd300" title="5 minutos por segundo">300x</button>
-        <button class="btn-speed" onclick="setSpeed(3600)" id="spd3600" title="1 hora por segundo">3600x</button>
+        <button class="btn-speed" onclick="setSpeed(10)" id="spd10" title="10x">10x</button>
+        <button class="btn-speed" onclick="setSpeed(60)" id="spd60" title="1 min/s">60x</button>
+        <button class="btn-speed" onclick="setSpeed(300)" id="spd300" title="5 min/s">300x</button>
+        <button class="btn-speed" onclick="setSpeed(3600)" id="spd3600" title="1 h/s">3600x</button>
       </div>
 
-      <button class="btn-tool" onclick="fastForwardToReading()" title="Salta o relógio até a próxima leitura agendada">
-        ⏩ Próxima Leitura
+      <button class="btn-tool" onclick="fastForwardToReading()" title="Avançar diretamente para a próxima leitura de solo">
+        ⏩ Próx. Leitura
       </button>
 
       <button class="btn-tool active-sound" id="btnSound" onclick="toggleSound()">
         🔊 Som: ON
       </button>
 
-      <button class="btn-tool" onclick="resetSystem()" title="Reinicia o microcontrolador">
+      <button class="btn-tool" onclick="resetSystem()" title="Reiniciar microcontrolador">
         🔄 Reset Uno
       </button>
     </div>
   </header>
 
-  <!-- MAIN SIMULATION STAGE -->
-  <main>
+  <!-- NAVIGATION TABS -->
+  <nav class="nav-tabs">
+    <button class="main-tab-btn active" onclick="switchMainTab('tabGardenView')">🌿 Visão da Horta & Bancada</button>
+    <button class="main-tab-btn" onclick="switchMainTab('tabSchematicView')">⚡ Esquema Elétrico Funcional</button>
+    <button class="main-tab-btn" onclick="switchMainTab('tabCodeEditor')">💻 Código C++ (Tinkercad IDE)</button>
+    <button class="main-tab-btn" onclick="switchMainTab('tabHydraulicsConfig')">💧 Hidráulica & 9 Prateleiras</button>
+    <button class="main-tab-btn" onclick="switchMainTab('tabScenarios')">🧪 Cenários de Teste Rápidos</button>
+    <button class="main-tab-btn" onclick="switchMainTab('tabPhotos')">📸 Fotos do Projeto Real</button>
+  </nav>
 
-    <!-- COLUMN 1: ARDUINO CONTROLLER & 16X2 LCD -->
-    <div class="column">
-      
-      <!-- LCD 16x2 DISPLAY -->
-      <div class="card">
-        <div class="card-title">
-          <span class="card-title-icon">📟 Display LCD 16x2 (HD44780)</span>
-          <span id="lcdBacklightBadge" class="lcd-badge badge-on">BACKLIGHT ON</span>
-        </div>
+  <!-- ==================== TAB 1: VISÃO DA HORTA & BANCADA ==================== -->
+  <section id="tabGardenView" class="view-content active">
+    <div class="garden-view-grid">
 
-        <div class="lcd-enclosure">
-          <div class="lcd-bezel">
-            <div id="lcdScreen" class="lcd-screen backlight-on">
-              <div id="lcdLine1" class="lcd-line">HORTA AUTONOMA  </div>
-              <div id="lcdLine2" class="lcd-line">Iniciando...    </div>
+      <!-- COL 1: LCD CANVAS, BOTÃO & ARDUINO HARDWARE -->
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        
+        <!-- LCD 16X2 COM MATRIZ DE PIXELS GRANDES 5x8 -->
+        <div class="card">
+          <div class="card-title">
+            <span>📟 Display LCD 16x2 (Matriz 5x8 Pixels)</span>
+            <span id="lcdBacklightBadge" class="lcd-badge badge-on">BACKLIGHT ON</span>
+          </div>
+
+          <div class="lcd-enclosure-box">
+            <div class="lcd-bezel-box">
+              <div id="lcdCanvasWrap" class="lcd-canvas-wrap backlight-on">
+                <!-- Canvas de renderização dos pixels 5x8 HD44780 -->
+                <canvas id="lcdCanvas" width="560" height="114"></canvas>
+              </div>
+              <div class="lcd-meta-bar">
+                <span>Página: <b id="lblPageNum" style="color:var(--accent)">0/5</b> <span id="lblPageName">(Status)</span></span>
+                <span id="lblEditStatus" class="lcd-badge" style="display:none;">MODO EDIÇÃO</span>
+                <span>Sleep: <b id="lblLcdTimer" style="color:var(--text-main)">30s</b></span>
+              </div>
             </div>
           </div>
-          <div class="lcd-meta">
-            <span>Página: <b id="lblPageNum" style="color:var(--accent)">0/5</b> <span id="lblPageName">(Status)</span></span>
-            <span id="lblEditStatus" class="lcd-badge" style="display:none;">MODO EDIÇÃO</span>
-            <span>Timeout: <b id="lblLcdTimer" style="color:var(--text-main)">30s</b></span>
-          </div>
-        </div>
-      </div>
-
-      <!-- TACTILE SINGLE BUTTON (D2) -->
-      <div class="card">
-        <div class="card-title">
-          <span class="card-title-icon">🔘 Botão Único Multifunção (Pino D2)</span>
-          <span style="font-size:0.7rem;color:var(--text-muted)">INPUT_PULLUP</span>
         </div>
 
-        <div class="button-control-card">
-          <div class="tactile-button-wrap">
-            <svg class="btn-svg-ring" viewBox="0 0 100 100">
-              <circle class="btn-ring-bg" cx="50" cy="50" r="44"></circle>
-              <circle id="btnProgressRing" class="btn-ring-progress" cx="50" cy="50" r="44"></circle>
-            </svg>
-            <button id="mainButton" class="tactile-button" 
-                    onmousedown="btnDown()" onmouseup="btnUp()" onmouseleave="btnUp()"
-                    ontouchstart="btnDown(event)" ontouchend="btnUp(event)">
-              PRESS
-            </button>
+        <!-- BOTÃO ÚNICO D2 (INPUT_PULLUP) -->
+        <div class="card">
+          <div class="card-title">
+            <span>🔘 Botão Único Multifunção (Pino D2)</span>
+            <span style="font-size:0.7rem;color:var(--text-muted)">INPUT_PULLUP</span>
           </div>
 
-          <div class="btn-hold-label" id="btnHoldLabel">
-            Pressione e segure • Limiar: <b>900 ms</b>
-          </div>
+          <div class="button-control-card">
+            <div class="tactile-button-wrap">
+              <svg class="btn-svg-ring" viewBox="0 0 100 100">
+                <circle class="btn-ring-bg" cx="50" cy="50" r="44"></circle>
+                <circle id="btnProgressRing" class="btn-ring-progress" cx="50" cy="50" r="44"></circle>
+              </svg>
+              <button id="mainButton" class="tactile-button"
+                      onmousedown="btnDown()" onmouseup="btnUp()" onmouseleave="btnUp()"
+                      ontouchstart="btnDown(event)" ontouchend="btnUp(event)">
+                PRESS
+              </button>
+            </div>
 
-          <div class="btn-quick-actions">
-            <button class="btn-quick" onclick="simulateShortClick()">
-              ⚡ Toque Curto (150ms)
-            </button>
-            <button class="btn-quick" onclick="simulateLongPress()">
-              ⏳ Pressão Longa (1.2s)
-            </button>
+            <div id="btnHoldLabel" style="font-size:0.72rem;font-family:'Share Tech Mono', monospace;color:var(--text-muted);text-align:center;">
+              Pressione e segure • Limiar: <b>900 ms</b>
+            </div>
+
+            <div style="display:flex;gap:8px;width:100%;">
+              <button class="btn-tool" style="flex:1;justify-content:center;" onclick="simulateShortClick()">
+                ⚡ Toque Curto (150ms)
+              </button>
+              <button class="btn-tool" style="flex:1;justify-content:center;" onclick="simulateLongPress()">
+                ⏳ Pressão Longa (1.2s)
+              </button>
+            </div>
           </div>
         </div>
 
-        <div style="margin-top:10px;font-size:0.72rem;color:var(--text-muted);line-height:1.4;">
-          💡 <b>Guia Rápido de Gestos:</b><br>
-          • <b>Curto (&lt;900ms):</b> Acorda tela / Avança tela / Muda valor na edição.<br>
-          • <b>Longo (≥900ms):</b> Entra em edição (telas 2, 3, 4) / Salva na EEPROM e sai.
-        </div>
-      </div>
-
-      <!-- ARDUINO UNO HARDWARE PINS & LEDS -->
-      <div class="card">
-        <div class="card-title">
-          <span class="card-title-icon">⚡ Hardware Uno R3 & Pinos</span>
-          <span style="font-size:0.7rem;color:var(--primary)">5.0V Buck</span>
-        </div>
-
-        <div class="arduino-status-grid">
-          <div class="pin-status-pill">
-            <span>D2 (Botão):</span>
-            <span id="pinD2Val" style="color:#38bdf8">HIGH</span>
+        <!-- MÓDULO RELÉ 5V (ACIONADOR DA SOLENÓIDE) -->
+        <div class="relay-module-box">
+          <div class="relay-header">
+            <span>🔌 Módulo Relé 5V (Kit Arduino)</span>
+            <span id="lblRelayStatusBadge" class="lcd-badge badge-off">DESLIGADO</span>
           </div>
-          <div class="pin-status-pill">
-            <span>D9 (Válvula):</span>
-            <span class="pin-led led-red" id="ledD9"></span>
+          <div class="relay-visual-diagram">
+            <div>IN (D9): <b id="lblRelayInVal" style="color:#38bdf8">LOW</b></div>
+            <div>Contatos: <b id="lblRelayContact" class="relay-contact-state" style="color:#ef4444">COM ➔ NC (Aberto)</b></div>
+            <div>Carga: <b id="lblRelayLoadVal">0 W</b></div>
           </div>
-          <div class="pin-status-pill">
-            <span>D10 (Backlight):</span>
-            <span class="pin-led led-green active" id="ledD10"></span>
-          </div>
-          <div class="pin-status-pill">
-            <span>D13 (LED L):</span>
-            <span class="pin-led led-yellow" id="ledD13"></span>
-          </div>
-          <div class="pin-status-pill">
-            <span>A0 (Sensor Solo):</span>
-            <span id="pinA0Val" style="color:var(--accent)">750 (11%)</span>
-          </div>
-          <div class="pin-status-pill">
-            <span>A1 (Divisor Bat):</span>
-            <span id="pinA1Val" style="color:var(--solar)">3.08V (12.4V)</span>
+          <div style="font-size:0.68rem;color:var(--text-muted);line-height:1.35">
+            • <b>Optoacoplador PC817:</b> Isola eletricamente a lógica do Arduino dos picos indutivos da válvula solenóide de 12V.<br>
+            • <b>Bobina 5V:</b> Consome ~70mA quando acionada; alimentada pelo regulador buck de 5V.
           </div>
         </div>
-      </div>
 
-      <!-- SERIAL MONITOR (9600 BAUD) -->
-      <div class="serial-card">
-        <div class="serial-header">
-          <span>🖥️ Monitor Serial (9600 baud)</span>
-          <div>
+        <!-- ARDUINO PINOUT E HARDWARE -->
+        <div class="card">
+          <div class="card-title">
+            <span>⚡ Pinagem Arduino Uno R3</span>
+            <span style="font-size:0.7rem;color:var(--primary)">5.0V Buck</span>
+          </div>
+
+          <div class="arduino-status-grid">
+            <div class="pin-status-pill">
+              <span>D2 (Botão):</span>
+              <span id="pinD2Val" style="color:#38bdf8">HIGH</span>
+            </div>
+            <div class="pin-status-pill">
+              <span>D9 (Relé Solenoide):</span>
+              <span class="pin-led led-red" id="ledD9"></span>
+            </div>
+            <div class="pin-status-pill">
+              <span>D10 (Backlight):</span>
+              <span class="pin-led led-green active" id="ledD10"></span>
+            </div>
+            <div class="pin-status-pill">
+              <span>A0 (Sensor Solo Kit):</span>
+              <span id="pinA0Val" style="color:var(--accent)">600 (45%)</span>
+            </div>
+            <div class="pin-status-pill">
+              <span>A1 (Divisor Bateria):</span>
+              <span id="pinA1Val" style="color:var(--solar)">3.08V (12.4V)</span>
+            </div>
+            <div class="pin-status-pill">
+              <span>LED D13:</span>
+              <span class="pin-led led-yellow" id="ledD13"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SERIAL MONITOR (9600 BAUD) -->
+        <div class="card" style="padding:10px;">
+          <div class="card-title" style="margin-bottom:6px;">
+            <span style="font-size:0.75rem;">🖥️ Monitor Serial (9600 baud)</span>
             <button onclick="clearSerial()" style="background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-size:0.7rem">Limpar</button>
-            <span style="color:#475569">•</span>
-            <button onclick="downloadSerialLog()" style="background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-size:0.7rem">Baixar</button>
+          </div>
+          <div id="serialLog" class="serial-output">
+            <div class="serial-log-line">[00:00:00.000] Horta Autonoma Iniciando...</div>
           </div>
         </div>
-        <div id="serialLog" class="serial-output">
-          <div class="serial-log-line">[00:00:00.000] Horta Autonoma Iniciando...</div>
+
+      </div>
+
+      <!-- COL 2: HORTA VERTICAL FÍSICA (3 PALETES DAS FOTOS) -->
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="garden-scene" id="gardenScene">
+          <div id="dayNightVeil" style="position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:1;transition:background 1s ease;"></div>
+
+          <!-- STATUS HIDRÁULICO -->
+          <div style="position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;background:rgba(15,23,42,0.8);backdrop-filter:blur(8px);padding:8px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);font-size:0.75rem;">
+            <div>
+              <span>💧 Rede de Água Pública (Pressão Direta)</span>
+              <span style="color:var(--text-muted)">|</span>
+              <span id="manualValveStatus">Registro Geral: <b>Aberto</b></span>
+            </div>
+            <div id="valveStatusBadge" style="display:flex;align-items:center;gap:6px;font-weight:700;font-family:'Share Tech Mono', monospace;">
+              <span class="pin-led led-red" id="solenoidLed" style="width:12px;height:12px;"></span>
+              <span id="lblValveState">VÁLVULA 12V: FECHADA</span>
+            </div>
+          </div>
+
+          <!-- 3 PALETES DE MADEIRA REAIS -->
+          <div class="pallets-container">
+
+            <!-- PALETE 1 (ESQUERDA - FOLHAGENS) -->
+            <div class="pallet-frame">
+              <div class="pallet-title-badge">
+                <span id="p1Title">Palete 1: Folhagens</span>
+                <span style="color:var(--accent);font-size:0.6rem" id="p1FlowBadge">6.0 L/h total</span>
+              </div>
+
+              <!-- Prateleira 1 -->
+              <div class="shelf-box" id="p1s1Box">
+                <div class="dripper-pipe"><span class="water-drop drop-1"></span><span class="water-drop drop-2"></span></div>
+                <div class="plant-foliage-wrap">
+                  <span class="leaf-bunch" id="p1s1Icon">🌿</span>
+                  <span class="leaf-bunch">🍃</span>
+                  <span class="leaf-hanging">🌱</span>
+                </div>
+                <div class="soil-layer"><div class="soil-moisture-indicator" id="soilP1S1"></div></div>
+              </div>
+
+              <!-- Prateleira 2 -->
+              <div class="shelf-box" id="p1s2Box">
+                <div class="dripper-pipe"><span class="water-drop drop-1"></span><span class="water-drop drop-3"></span></div>
+                <div class="plant-foliage-wrap">
+                  <span class="leaf-bunch" id="p1s2Icon">🪴</span>
+                  <span class="leaf-bunch">🌿</span>
+                  <span class="leaf-hanging" style="left:20%">🍃</span>
+                </div>
+                <div class="soil-layer"><div class="soil-moisture-indicator" id="soilP1S2"></div></div>
+              </div>
+
+              <!-- Prateleira 3 -->
+              <div class="shelf-box" id="p1s3Box">
+                <div class="dripper-pipe"><span class="water-drop drop-2"></span><span class="water-drop drop-3"></span></div>
+                <div class="plant-foliage-wrap">
+                  <span class="leaf-bunch" id="p1s3Icon">🌱</span>
+                  <span class="leaf-bunch">🌿</span>
+                  <span class="leaf-hanging" style="right:15%">🍃</span>
+                </div>
+                <div class="soil-layer"><div class="soil-moisture-indicator" id="soilP1S3"></div></div>
+              </div>
+            </div>
+
+            <!-- PALETE 2 (CENTRO - ELEVADO - HORTALIÇAS & SENSOR KIT LM393) -->
+            <div class="pallet-frame pallet-center">
+              <div class="pallet-title-badge" style="background:rgba(6, 182, 212, 0.25);border:1px solid rgba(6, 182, 212, 0.4)">
+                <span id="p2Title">Palete 2: Hortaliças & Sonda A0</span>
+                <span style="color:#38bdf8;font-size:0.6rem" id="p2FlowBadge">3.0 L/h total</span>
+              </div>
+
+              <!-- Prateleira 1 -->
+              <div class="shelf-box" id="p2s1Box">
+                <div class="dripper-pipe"><span class="water-drop drop-1"></span><span class="water-drop drop-2"></span></div>
+                <div class="plant-foliage-wrap">
+                  <span class="leaf-bunch" id="p2s1Icon">🥗</span>
+                  <span class="leaf-bunch">🌿</span>
+                </div>
+                <div class="soil-layer"><div class="soil-moisture-indicator" id="soilP2S1"></div></div>
+              </div>
+
+              <!-- Prateleira 2 (Vaso de Referência com Sensor de Umidade do Kit) -->
+              <div class="shelf-box" id="p2s2Box" style="border-color:var(--accent);">
+                <div class="sensor-probe" title="Sensor Resistivo de Umidade do Kit (LM393 -> A0)">
+                  <div class="sensor-probe-wire"></div>
+                </div>
+                <div class="dripper-pipe"><span class="water-drop drop-1"></span><span class="water-drop drop-2"></span><span class="water-drop drop-3"></span></div>
+                <div class="plant-foliage-wrap">
+                  <span class="leaf-bunch" id="p2s2Icon">🪴</span>
+                  <span class="leaf-bunch">🌱</span>
+                </div>
+                <div class="soil-layer" style="border:1px solid #06b6d4">
+                  <div class="soil-moisture-indicator" id="soilRef"></div>
+                </div>
+              </div>
+
+              <!-- Prateleira 3 -->
+              <div class="shelf-box" id="p2s3Box">
+                <div class="dripper-pipe"><span class="water-drop drop-1"></span><span class="water-drop drop-3"></span></div>
+                <div class="plant-foliage-wrap">
+                  <span class="leaf-bunch" id="p2s3Icon">🌿</span>
+                  <span class="leaf-bunch">🍃</span>
+                </div>
+                <div class="soil-layer"><div class="soil-moisture-indicator" id="soilP2S3"></div></div>
+              </div>
+            </div>
+
+            <!-- PALETE 3 (DIREITA - FLORES & SUCULENTAS) -->
+            <div class="pallet-frame">
+              <div class="pallet-title-badge">
+                <span id="p3Title">Palete 3: Flores & Baixa Água</span>
+                <span style="color:var(--solar);font-size:0.6rem" id="p3FlowBadge">1.5 L/h total</span>
+              </div>
+
+              <!-- Prateleira 1 -->
+              <div class="shelf-box" id="p3s1Box">
+                <div class="dripper-pipe"><span class="water-drop drop-2"></span></div>
+                <div class="plant-foliage-wrap">
+                  <span class="leaf-bunch" id="p3s1Icon">🌸</span>
+                  <span class="leaf-bunch">🌺</span>
+                </div>
+                <div class="soil-layer"><div class="soil-moisture-indicator" id="soilP3S1"></div></div>
+              </div>
+
+              <!-- Prateleira 2 -->
+              <div class="shelf-box" id="p3s2Box">
+                <div class="dripper-pipe"><span class="water-drop drop-1"></span></div>
+                <div class="plant-foliage-wrap">
+                  <span class="leaf-bunch" id="p3s2Icon">🌼</span>
+                  <span class="leaf-bunch">🌻</span>
+                </div>
+                <div class="soil-layer"><div class="soil-moisture-indicator" id="soilP3S2"></div></div>
+              </div>
+
+              <!-- Prateleira 3 -->
+              <div class="shelf-box" id="p3s3Box">
+                <div class="dripper-pipe"><span class="water-drop drop-3"></span></div>
+                <div class="plant-foliage-wrap">
+                  <span class="leaf-bunch" id="p3s3Icon">🌵</span>
+                  <span class="leaf-bunch">🪴</span>
+                </div>
+                <div class="soil-layer"><div class="soil-moisture-indicator" id="soilP3S3"></div></div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- FOOTER DE DADOS DA HORTA -->
+          <div style="position:relative;z-index:2;background:rgba(15,23,42,0.85);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 14px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;font-size:0.72rem;font-family:'Share Tech Mono', monospace;">
+            <div>
+              <div style="color:var(--text-muted);font-size:0.65rem;">UMIDADE VASO REFERÊNCIA</div>
+              <div style="color:#fff;font-weight:700;" id="lblGardenMoisture">45% (RAW: 600)</div>
+            </div>
+            <div>
+              <div style="color:var(--text-muted);font-size:0.65rem;">ÁGUA TOTAL ENTREGUE</div>
+              <div style="color:#fff;font-weight:700;" id="lblTotalWater">0.00 L</div>
+            </div>
+            <div>
+              <div style="color:var(--text-muted);font-size:0.65rem;">VAZÃO INSTANTÂNEA</div>
+              <div style="color:#38bdf8;font-weight:700;" id="lblHydraulicFlow">0.00 L/h (Estático)</div>
+            </div>
+          </div>
+
         </div>
       </div>
 
-    </div>
-
-    <!-- COLUMN 2: PHYSICAL VERTICAL GARDEN (3 PALLETS FROM USER PHOTOS) -->
-    <div class="column">
-      <div class="garden-scene" id="gardenScene">
-        <div class="day-night-veil" id="dayNightVeil"></div>
-
-        <!-- GARDEN HEADER & HYDRAULIC STATUS -->
-        <div class="garden-header">
-          <div class="hydraulics-bar">
-            <span>💧 Rede de Água Pública (Pressão Direta)</span>
-            <span style="color:var(--text-muted)">|</span>
-            <span id="manualValveStatus">Registro Manual: Aberto</span>
-          </div>
-          <div class="valve-indicator" id="valveStatusBadge">
-            <span class="valve-icon"></span>
-            <span id="lblValveState">VÁLVULA 12V: FECHADA</span>
-          </div>
-        </div>
-
-        <!-- 3 WOODEN PALLETS (REPRESENTING USER PROJECT PHOTOS) -->
-        <div class="pallets-container">
-
-          <!-- PALLET 1 (LEFT): FOLIAGE & HANGING VINES (2.0 L/h) -->
-          <div class="pallet-frame">
-            <div class="pallet-title">
-              <span>Palete 1: Folhagens</span>
-              <span style="color:var(--accent);font-size:0.6rem">2.0 L/h</span>
-            </div>
-
-            <!-- Shelf 1 -->
-            <div class="shelf-box">
-              <div class="dripper-pipe"><span class="water-drop drop-1"></span><span class="water-drop drop-2"></span></div>
-              <div class="plant-foliage">
-                <span class="leaf-bunch">🌿</span>
-                <span class="leaf-bunch">🍃</span>
-                <span class="leaf-hanging">🌱</span>
-              </div>
-              <div class="soil-layer"><div class="soil-moisture-indicator" id="soilP1S1"></div></div>
-            </div>
-
-            <!-- Shelf 2 -->
-            <div class="shelf-box">
-              <div class="dripper-pipe"><span class="water-drop drop-1"></span><span class="water-drop drop-3"></span></div>
-              <div class="plant-foliage">
-                <span class="leaf-bunch">🪴</span>
-                <span class="leaf-bunch">🌿</span>
-                <span class="leaf-hanging" style="left:20%">🍃</span>
-              </div>
-              <div class="soil-layer"><div class="soil-moisture-indicator" id="soilP1S2"></div></div>
-            </div>
-
-            <!-- Shelf 3 -->
-            <div class="shelf-box">
-              <div class="dripper-pipe"><span class="water-drop drop-2"></span><span class="water-drop drop-3"></span></div>
-              <div class="plant-foliage">
-                <span class="leaf-bunch">🌱</span>
-                <span class="leaf-bunch">🌿</span>
-                <span class="leaf-hanging" style="right:15%">🍃</span>
-              </div>
-              <div class="soil-layer"><div class="soil-moisture-indicator" id="soilP1S3"></div></div>
-            </div>
-          </div>
-
-          <!-- PALLET 2 (CENTER - ELEVATED): HERBS & REFERENCE SOIL SENSOR (1.0 L/h) -->
-          <div class="pallet-frame pallet-center">
-            <div class="pallet-title" style="background:rgba(6, 182, 212, 0.25);border:1px solid rgba(6, 182, 212, 0.4)">
-              <span>Palete 2: Hortaliças & Sonda A0</span>
-              <span style="color:#38bdf8;font-size:0.6rem">1.0 L/h</span>
-            </div>
-
-            <!-- Shelf 1 -->
-            <div class="shelf-box">
-              <div class="dripper-pipe"><span class="water-drop drop-1"></span><span class="water-drop drop-2"></span></div>
-              <div class="plant-foliage">
-                <span class="leaf-bunch">🥗</span>
-                <span class="leaf-bunch">🌿</span>
-              </div>
-              <div class="soil-layer"><div class="soil-moisture-indicator" id="soilP2S1"></div></div>
-            </div>
-
-            <!-- Shelf 2 (Reference pot with Capacitive Sensor) -->
-            <div class="shelf-box" style="border-color:var(--accent);">
-              <div class="sensor-probe" title="Sensor Capacitivo de Umidade (A0)">
-                <div class="sensor-probe-wire"></div>
-              </div>
-              <div class="dripper-pipe"><span class="water-drop drop-1"></span><span class="water-drop drop-2"></span><span class="water-drop drop-3"></span></div>
-              <div class="plant-foliage">
-                <span class="leaf-bunch">🪴</span>
-                <span class="leaf-bunch">🌱</span>
-              </div>
-              <div class="soil-layer" style="border:1px solid #06b6d4">
-                <div class="soil-moisture-indicator" id="soilRef"></div>
-              </div>
-            </div>
-
-            <!-- Shelf 3 -->
-            <div class="shelf-box">
-              <div class="dripper-pipe"><span class="water-drop drop-1"></span><span class="water-drop drop-3"></span></div>
-              <div class="plant-foliage">
-                <span class="leaf-bunch">🌿</span>
-                <span class="leaf-bunch">🍃</span>
-              </div>
-              <div class="soil-layer"><div class="soil-moisture-indicator" id="soilP2S3"></div></div>
-            </div>
-          </div>
-
-          <!-- PALLET 3 (RIGHT): FLOWERS & LOW WATER DEMAND (0.5 L/h) -->
-          <div class="pallet-frame">
-            <div class="pallet-title">
-              <span>Palete 3: Flores & Suculentas</span>
-              <span style="color:var(--solar);font-size:0.6rem">0.5 L/h</span>
-            </div>
-
-            <!-- Shelf 1 -->
-            <div class="shelf-box">
-              <div class="dripper-pipe"><span class="water-drop drop-2"></span></div>
-              <div class="plant-foliage">
-                <span class="leaf-bunch">🌸</span>
-                <span class="leaf-bunch">🌺</span>
-              </div>
-              <div class="soil-layer"><div class="soil-moisture-indicator" id="soilP3S1"></div></div>
-            </div>
-
-            <!-- Shelf 2 -->
-            <div class="shelf-box">
-              <div class="dripper-pipe"><span class="water-drop drop-1"></span></div>
-              <div class="plant-foliage">
-                <span class="leaf-bunch">🌼</span>
-                <span class="leaf-bunch">🌻</span>
-              </div>
-              <div class="soil-layer"><div class="soil-moisture-indicator" id="soilP3S2"></div></div>
-            </div>
-
-            <!-- Shelf 3 -->
-            <div class="shelf-box">
-              <div class="dripper-pipe"><span class="water-drop drop-3"></span></div>
-              <div class="plant-foliage">
-                <span class="leaf-bunch">🌵</span>
-                <span class="leaf-bunch">🪴</span>
-              </div>
-              <div class="soil-layer"><div class="soil-moisture-indicator" id="soilP3S3"></div></div>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- GARDEN STATS FOOTER -->
-        <div class="garden-footer">
-          <div class="garden-stat">
-            <span class="stat-label">UMIDADE VASO REFERÊNCIA</span>
-            <span class="stat-val" id="lblGardenMoisture">45% (RAW: 600)</span>
-          </div>
-          <div class="garden-stat">
-            <span class="stat-label">ÁGUA TOTAL ENTREGUE</span>
-            <span class="stat-val" id="lblTotalWater">0.00 L</span>
-          </div>
-          <div class="garden-stat">
-            <span class="stat-label">ESTADO HIDRÁULICO</span>
-            <span class="stat-val" id="lblHydraulicFlow" style="color:#38bdf8">0.00 L/h (Estático)</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- COLUMN 3: SOLAR ENERGY, SUN21 CONTROLLER & 12V BATTERY -->
-    <div class="column col-power">
-
-      <!-- SOLAR PANEL (20 Wp) -->
-      <div class="solar-panel-card">
-        <div class="solar-header">
-          <span style="color:var(--solar)">☀️ Painel Solar Fotovoltaico (20 Wp)</span>
-          <span id="lblSolarPower" style="font-family:'Share Tech Mono';color:#fbbf24">0.0 W</span>
-        </div>
-
-        <div class="solar-visual">
-          <div class="solar-cells-grid"></div>
-          <div class="sun-orb" id="sunOrb" style="left:50%;top:14px"></div>
-          <span id="lblSunStatus" style="position:relative;z-index:2;font-size:0.75rem;font-weight:700;color:#fff;text-shadow:0 1px 4px #000">
-            ☀️ Pleno Sol (1000 W/m²)
-          </span>
-        </div>
-
-        <div class="sun-slider-wrap">
-          <span>0 W/m²</span>
-          <input type="range" id="sliderSolar" min="0" max="1000" value="750" oninput="updateSolarFromSlider()">
-          <span>1000 W/m²</span>
-        </div>
-      </div>
-
-      <!-- SUN21 CCS-P1024 PWM CHARGE CONTROLLER -->
-      <div class="sun21-card">
-        <div class="card-title" style="margin-bottom:8px">
-          <span style="color:#60a5fa">📟 Controlador SUN21 CCS-P1024</span>
-          <span style="font-size:0.7rem;color:var(--text-muted)">PWM 10A</span>
-        </div>
-
-        <div class="sun21-screen">
-          <span id="sun21Mode">MODO: CARGA BULK</span>
-          <span id="sun21Volt">14.1 V</span>
-        </div>
-
-        <div class="sun21-leds">
-          <div class="sun21-led-item">
-            <span class="pin-led led-green" id="ledSunPv"></span>
-            <span>PV SOLAR</span>
-          </div>
-          <div class="sun21-led-item">
-            <span class="pin-led led-green active" id="ledSunBat"></span>
-            <span>BATERIA</span>
-          </div>
-          <div class="sun21-led-item">
-            <span class="pin-led led-blue active" id="ledSunLoad"></span>
-            <span>LOAD (12V)</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- 12V 9Ah MOTORCYCLE BATTERY -->
-      <div class="battery-card">
-        <div class="card-title" style="margin-bottom:6px">
-          <span style="color:#a7f3d0">🔋 Bateria de Moto (12V / 9Ah)</span>
-          <span id="lblBatPercent" style="font-family:'Share Tech Mono';color:#10b981">85% (12.4V)</span>
-        </div>
-
-        <div class="battery-meter-wrap">
-          <div class="battery-shell">
-            <div class="battery-fill" id="batFill" style="width:85%"></div>
-          </div>
-          <div class="battery-nipple"></div>
-        </div>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:0.72rem;font-family:'Share Tech Mono';color:var(--text-muted);margin-top:4px;">
-          <div>Corrente: <b id="lblBatCurrent" style="color:#38bdf8">-45 mA</b></div>
-          <div>Corte Soft: <b style="color:var(--danger)">11.90V</b></div>
-        </div>
-
-        <div style="font-size:0.68rem;color:var(--text-muted);margin-top:2px;">
-          Proteção LVD Externa: Corte <b>11.1V</b> • Recuperação <b>12.6V</b>
-        </div>
-      </div>
-
-      <!-- VOLTAGE DIVIDER 100k / 33k (PIN A1) -->
-      <div class="card" style="padding:12px">
-        <div class="card-title" style="margin-bottom:6px">
-          <span style="font-size:0.75rem">📐 Divisor Resistivo (100k / 33k)</span>
-          <span style="font-size:0.68rem;color:var(--accent)">Pino A1</span>
-        </div>
-        <div style="font-family:'Share Tech Mono';font-size:0.73rem;color:var(--text-muted);line-height:1.4">
-          Divisor: V_A1 = V_Bat × (33k / 133k)<br>
-          Tensão Pino A1: <b id="lblA1Volts" style="color:var(--accent)">3.08 V</b> (ADC: <b id="lblA1Adc">630</b>)<br>
-          Limite de Bloqueio (11.90V): ADC &lt; <b>604</b>
-        </div>
-      </div>
-
-      <!-- MOSFET & 12V SOLENOID VALVE DRIVER -->
-      <div class="card" style="padding:12px">
-        <div class="card-title" style="margin-bottom:6px">
-          <span style="font-size:0.75rem">🔌 Driver MOSFET (D9) & Válvula</span>
-          <span id="lblMosfetState" style="font-size:0.68rem;color:#f87171">MOSFET: OFF</span>
-        </div>
-        <div style="font-family:'Share Tech Mono';font-size:0.72rem;color:var(--text-muted);line-height:1.4">
-          Gate: 100Ω + 10kΩ Pull-down (D9)<br>
-          Bobina: 12Vcc NC • Diodo 1N5408 Roda Livre<br>
-          Potência Válvula: <b>18.0 W</b> (1.50 A @ 12V)
-        </div>
-      </div>
-
-    </div>
-
-  </main>
-
-  <!-- BOTTOM TABS SECTION: SCENARIOS, CALIBRATION, SCHEMATICS, PHOTOS, MANUAL -->
-  <section class="bottom-section">
-    <div class="tabs-header">
-      <button class="tab-btn active" onclick="switchTab('tabScenarios')">🧪 Cenários de Teste Rápidos</button>
-      <button class="tab-btn" onclick="switchTab('tabSliders')">🎛️ Calibração & Sliders Livres</button>
-      <button class="tab-btn" onclick="switchTab('tabWiring')">📐 Esquema Elétrico & Ligações</button>
-      <button class="tab-btn" onclick="switchTab('tabPhotos')">📸 Fotos do Projeto Real (3 Paletes)</button>
-      <button class="tab-btn" onclick="switchTab('tabManual')">📖 Guia do Firmware & Operação</button>
-    </div>
-
-    <!-- TAB 1: SCENARIOS -->
-    <div id="tabScenarios" class="tab-content active">
-      <div class="scenarios-grid">
+      <!-- COL 3: ENERGIA SOLAR, SUN21 & BATERIA 12V -->
+      <div class="col-power-garden" style="display:flex;flex-direction:column;gap:14px;">
         
-        <div class="scenario-card" onclick="applyScenario('dry_soil')">
-          <div class="scenario-name">🌱 Solo Seco (10% - RAW 755)</div>
-          <div class="scenario-desc">Simula substrato seco abaixo do limite (45%). No próximo ciclo de leitura, a válvula de 12V abrirá por 30s.</div>
-        </div>
+        <!-- PAINEL SOLAR 20 Wp -->
+        <div class="card" style="padding:12px;">
+          <div class="card-title" style="margin-bottom:8px;">
+            <span style="color:var(--solar)">☀️ Painel Solar (20 Wp)</span>
+            <span id="lblSolarPower" style="font-family:'Share Tech Mono';color:#fbbf24">0.0 W</span>
+          </div>
 
-        <div class="scenario-card" onclick="applyScenario('wet_soil')">
-          <div class="scenario-name">💧 Solo Úmido (75% - RAW 462)</div>
-          <div class="scenario-desc">Simula solo bem irrigado acima do limiar. O sistema mantém a válvula fechada e agenda a próxima leitura.</div>
-        </div>
+          <div style="height:60px;background:#020617;border:1px solid #1e293b;border-radius:6px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;">
+            <div style="position:absolute;top:0;left:0;right:0;bottom:0;background-image:linear-gradient(#1e3a8a 1px, transparent 1px), linear-gradient(90deg, #1e3a8a 1px, transparent 1px);background-size:20px 20px;opacity:0.4;"></div>
+            <div id="sunOrb" style="position:absolute;width:32px;height:32px;background:radial-gradient(circle, #fde047 0%, #f59e0b 80%);border-radius:50%;box-shadow:0 0 20px #f59e0b;transition:all 0.5s ease;left:50%;top:14px;"></div>
+            <span id="lblSunStatus" style="position:relative;z-index:2;font-size:0.75rem;font-weight:700;color:#fff;text-shadow:0 1px 4px #000">☀️ Pleno Sol (750 W/m²)</span>
+          </div>
 
-        <div class="scenario-card" onclick="applyScenario('sensor_fault_open')">
-          <div class="scenario-name">⚠️ Falha: Cabo Desconectado (RAW 1023)</div>
-          <div class="scenario-desc">Simula interrupção do cabo analógico do sensor (RAW ≥ 1018). LCD exibe "ERRO NO SENSOR" e bloqueia irrigação.</div>
-        </div>
-
-        <div class="scenario-card" onclick="applyScenario('sensor_fault_short')">
-          <div class="scenario-name">⚠️ Falha: Sensor em Curto (RAW 0)</div>
-          <div class="scenario-desc">Simula curto para o terra na linha AO (RAW ≤ 5). O microcontrolador detecta anomalia e previne afogamento da horta.</div>
-        </div>
-
-        <div class="scenario-card" onclick="applyScenario('low_battery')">
-          <div class="scenario-name">🪫 Bateria Baixa (11.50 V)</div>
-          <div class="scenario-desc">Tensão abaixo de 11.90V. Tela 5 indica "BATERIA BAIXA". Mesmo com solo seco, o firmware bloqueia nova irrigação.</div>
-        </div>
-
-        <div class="scenario-card" onclick="applyScenario('battery_ok')">
-          <div class="scenario-name">🔋 Bateria Recarregada (12.80 V)</div>
-          <div class="scenario-desc">Restaura a bateria para carga normal. Permite novos ciclos automáticos de irrigação.</div>
-        </div>
-
-        <div class="scenario-card" onclick="applyScenario('sleep_lcd')">
-          <div class="scenario-name">💡 Simular Inatividade (LCD Sleep)</div>
-          <div class="scenario-desc">Avança 30 segundos sem toques. O transistor do backlight desliga. O primeiro toque seguinte apenas acorda o display.</div>
-        </div>
-
-        <div class="scenario-card" onclick="forceReadNow()">
-          <div class="scenario-name">⏱️ Forçar Leitura Imediata</div>
-          <div class="scenario-desc">Executa a rotina takeSoilReading() imediatamente, avaliando o solo e disparando a irrigação se necessário.</div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- TAB 2: FREE SLIDERS -->
-    <div id="tabSliders" class="tab-content">
-      <div class="card" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:20px;">
-        
-        <div>
-          <label style="font-size:0.8rem;font-weight:600;display:flex;justify-content:space-between">
-            <span>Umidade do Solo (Substrato)</span>
-            <span id="sliderMoistVal" style="color:var(--accent)">45% (RAW: 598)</span>
-          </label>
-          <input type="range" id="sliderMoisture" min="0" max="100" value="45" oninput="onManualMoistureChange()" style="width:100%;margin-top:8px">
-          <div style="display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text-muted);margin-top:4px">
-            <span>0% (Seco - RAW 800)</span>
-            <span>100% (Úmido - RAW 350)</span>
+          <div style="display:flex;align-items:center;gap:8px;font-size:0.72rem;color:var(--text-muted);margin-top:8px;">
+            <span>0</span>
+            <input type="range" id="sliderSolar" min="0" max="1000" value="750" oninput="updateSolarFromSlider()" style="flex:1;">
+            <span>1000 W/m²</span>
           </div>
         </div>
 
-        <div>
-          <label style="font-size:0.8rem;font-weight:600;display:flex;justify-content:space-between">
-            <span>Tensão da Bateria 12V</span>
-            <span id="sliderBatVal" style="color:#10b981">12.4 V</span>
-          </label>
-          <input type="range" id="sliderBattery" min="100" max="145" value="124" oninput="onManualBatteryChange()" style="width:100%;margin-top:8px">
-          <div style="display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text-muted);margin-top:4px">
-            <span>10.0 V (Descarga)</span>
-            <span>11.9V (Corte Soft)</span>
-            <span>14.5 V (Carga)</span>
+        <!-- CONTROLADOR SUN21 PWM -->
+        <div class="card" style="padding:12px;border-color:#2563eb;">
+          <div class="card-title" style="margin-bottom:8px;">
+            <span style="color:#60a5fa">📟 Controlador SUN21 CCS-P1024</span>
+            <span style="font-size:0.68rem;color:var(--text-muted)">PWM 10A</span>
+          </div>
+
+          <div style="background:#60a5fa;color:#030712;font-family:'Share Tech Mono';padding:6px 10px;border-radius:6px;font-size:0.8rem;font-weight:700;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <span id="sun21Mode">MODO: CARGA BULK</span>
+            <span id="sun21Volt">14.1 V</span>
+          </div>
+
+          <div style="display:flex;justify-content:space-around;font-size:0.65rem;color:var(--text-muted);">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+              <span class="pin-led led-green" id="ledSunPv"></span>
+              <span>PV SOLAR</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+              <span class="pin-led led-green active" id="ledSunBat"></span>
+              <span>BATERIA</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+              <span class="pin-led led-blue active" id="ledSunLoad"></span>
+              <span>LOAD (12V)</span>
+            </div>
           </div>
         </div>
 
-        <div>
-          <label style="font-size:0.8rem;font-weight:600;display:flex;justify-content:space-between">
-            <span>Irradiação Solar</span>
-            <span id="sliderSunVal" style="color:var(--solar)">750 W/m²</span>
-          </label>
-          <input type="range" id="sliderSunBottom" min="0" max="1000" value="750" oninput="onManualSunChange()" style="width:100%;margin-top:8px">
-          <div style="display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text-muted);margin-top:4px">
-            <span>0 W/m² (Noite)</span>
-            <span>500 W/m² (Nublado)</span>
-            <span>1000 W/m² (Pleno Sol)</span>
+        <!-- BATERIA 12V 9Ah -->
+        <div class="card" style="padding:12px;">
+          <div class="card-title" style="margin-bottom:6px;">
+            <span style="color:#a7f3d0">🔋 Bateria de Moto (12V / 9Ah)</span>
+            <span id="lblBatPercent" style="font-family:'Share Tech Mono';color:#10b981">85% (12.4V)</span>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="flex:1;height:20px;background:#1e293b;border:2px solid #475569;border-radius:4px;padding:2px;">
+              <div id="batFill" style="height:100%;background:linear-gradient(90deg, #ef4444 0%, #f59e0b 35%, #10b981 100%);border-radius:2px;width:85%;transition:width 0.3s ease;"></div>
+            </div>
+            <div style="width:4px;height:10px;background:#475569;border-radius:0 2px 2px 0;"></div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:0.72rem;font-family:'Share Tech Mono';color:var(--text-muted);margin-top:6px;">
+            <div>Corrente: <b id="lblBatCurrent" style="color:#38bdf8">-45 mA</b></div>
+            <div>Corte Soft: <b style="color:var(--danger)">11.90V</b></div>
+          </div>
+        </div>
+
+        <!-- SENSOR DO KIT: COMPARADOR LM393 & CALIBRAÇÃO -->
+        <div class="card" style="padding:12px;">
+          <div class="card-title" style="margin-bottom:6px;">
+            <span style="font-size:0.75rem;">🌱 Sensor do Kit (Garfo Resistivo + LM393)</span>
+          </div>
+          <div style="font-family:'Share Tech Mono';font-size:0.72rem;color:var(--text-muted);line-height:1.4">
+            • <b>Saída Analógica (AO ➔ A0):</b> <b id="lblKitAoVal" style="color:var(--accent)">600 (45%)</b><br>
+            • <b>Comparador Digital (DO):</b> <b id="lblKitDoVal" style="color:#4ade80">LOW (Úmido)</b><br>
+            • <b>Faixa Calibrada:</b> 800 (Seco) até 350 (Úmido)<br>
+            <span style="font-size:0.68rem;color:#cbd5e1;">⚠️ <i>Dica Kit: Para evitar corrosão por eletrólise do garfo, ligue o VCC do sensor em um pino digital (ex: D8) e alimente só na leitura.</i></span>
           </div>
         </div>
 
       </div>
+
     </div>
-
-    <!-- TAB 3: WIRING SCHEMATIC & PINS -->
-    <div id="tabWiring" class="tab-content">
-      <div class="card" style="display:flex;flex-direction:column;gap:16px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <h3 style="font-size:0.95rem">Mapeamento de Pinos & Circuito Elétrico (Tinkercad e Bancada Real)</h3>
-          <button class="btn-tool" onclick="openModal('modalSchematic')">🔍 Ver Imagem do Esquema Elétrico</button>
-        </div>
-
-        <table class="wiring-table">
-          <thead>
-            <tr>
-              <th>Pino Arduino Uno</th>
-              <th>Componente / Destino</th>
-              <th>Função / Configuração</th>
-              <th>Observação Técnica</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><b>D2</b></td>
-              <td>Botão Momentâneo (Pushbutton)</td>
-              <td>Entrada com <code>INPUT_PULLUP</code></td>
-              <td>Um terminal no D2, o outro diretamente ao GND comum. Sem resistor externo.</td>
-            </tr>
-            <tr>
-              <td><b>D3</b></td>
-              <td>LCD Pino 14 (D7)</td>
-              <td>Barramento de Dados 4-bit</td>
-              <td>Comunicação paralela HD44780.</td>
-            </tr>
-            <tr>
-              <td><b>D4</b></td>
-              <td>LCD Pino 12 (D5)</td>
-              <td>Barramento de Dados 4-bit</td>
-              <td>Comunicação paralela HD44780.</td>
-            </tr>
-            <tr>
-              <td><b>D5</b></td>
-              <td>LCD Pino 11 (D4)</td>
-              <td>Barramento de Dados 4-bit</td>
-              <td>Comunicação paralela HD44780.</td>
-            </tr>
-            <tr>
-              <td><b>D6</b></td>
-              <td>LCD Pino 13 (D6)</td>
-              <td>Barramento de Dados 4-bit</td>
-              <td>Comunicação paralela HD44780.</td>
-            </tr>
-            <tr>
-              <td><b>D9</b></td>
-              <td>Gate do MOSFET Canal N (Válvula)</td>
-              <td>Saída Digital (HIGH = Liga Válvula)</td>
-              <td>Resistor 100Ω em série com Gate; resistor 10kΩ pull-down para GND.</td>
-            </tr>
-            <tr>
-              <td><b>D10</b></td>
-              <td>Base do Transistor 2N2222 (Backlight)</td>
-              <td>Saída Digital (HIGH = Liga Luz LCD)</td>
-              <td>Resistor 1kΩ em série com a base; resistor 10kΩ base-GND; coletor no LCD pino 16.</td>
-            </tr>
-            <tr>
-              <td><b>D11</b></td>
-              <td>LCD Pino 6 (Enable / E)</td>
-              <td>Sinal de Habilitação do LCD</td>
-              <td>Pulso de sincronismo de escrita.</td>
-            </tr>
-            <tr>
-              <td><b>D12</b></td>
-              <td>LCD Pino 4 (Register Select / RS)</td>
-              <td>Seleção de Instrução / Dado</td>
-              <td>Controle de modo de escrita do HD44780.</td>
-            </tr>
-            <tr>
-              <td><b>A0</b></td>
-              <td>Saída AO do Sensor Capacitivo</td>
-              <td>Entrada Analógica (0-1023)</td>
-              <td>Mede constante dielétrica do solo. 800=seco, 350=úmido. Falha se ≤5 ou ≥1018.</td>
-            </tr>
-            <tr>
-              <td><b>A1</b></td>
-              <td>Nó central do Divisor 100k / 33k</td>
-              <td>Entrada Analógica (0-1023)</td>
-              <td>Reduz 12V da bateria para ~3.0V. NUNCA ligar 12V direto no pino A1.</td>
-            </tr>
-            <tr>
-              <td><b>5V & GND</b></td>
-              <td>Conversor Buck 12V->5V (2A)</td>
-              <td>Alimentação Lógica do Sistema</td>
-              <td>Buck alimenta Uno, LCD e Sensor. Válvula 12V alimentada pelo barramento 12V.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- TAB 4: REAL PROJECT PHOTOS -->
-    <div id="tabPhotos" class="tab-content">
-      <div class="card" style="display:flex;flex-direction:column;gap:16px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <h3 style="font-size:0.95rem">Registros Fotográficos da Instalação Real (3 Paletes de Madeira)</h3>
-        </div>
-        <p style="font-size:0.78rem;color:var(--text-muted);line-height:1.4">
-          A horta é estruturada em 3 paletes de madeira fixados na parede de alvenaria. Na foto original, o palete central está ligeiramente mais alto, criando uma composição harmoniosa. Cada prateleira abriga espécies específicas com vazões calibradas:
-        </p>
-
-        <div class="img-preview-grid">
-          <div class="img-card">
-            <img src="./WhatsApp Image 2026-11-09 at 11.36.28 (1).jpeg" alt="Estrutura de Paletes vazia" onerror="this.src='https://placehold.co/600x400/1e293b/94a3b8?text=Estrutura+dos+3+Paletes+Vazia'">
-            <p><b>Figura 1:</b> Estrutura inicial dos 3 paletes de madeira instalados na parede antes do plantio e da passagem dos tubos gotejadores.</p>
-          </div>
-          <div class="img-card">
-            <img src="./WhatsApp Image 2026-11-09 at 11.36.28.jpeg" alt="Horta vertical com plantas" onerror="this.src='https://placehold.co/600x400/1e293b/94a3b8?text=Horta+Vertical+Montada+e+Plantada'">
-            <p><b>Figura 2:</b> Horta vertical implantada e viçosa: Jiboias pendentes e samambaias à esquerda; hortaliças e ervas no centro; flores e suculentas à direita.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- TAB 5: FIRMWARE MANUAL -->
-    <div id="tabManual" class="tab-content">
-      <div class="card" style="font-size:0.8rem;line-height:1.6;display:flex;flex-direction:column;gap:12px;">
-        <h3 style="font-size:0.95rem;color:var(--accent)">Manual do Firmware & Regras de Negócio (horta_vertical.ino)</h3>
-        
-        <div>
-          <b>1. Interface do Botão Único (One-Button Navigation):</b><br>
-          • <b>Repouso / LCD Apagado:</b> Após 30 segundos sem atividade, o pino D10 vai para LOW desligando o transistor do backlight. O primeiro clique apenas acorda a tela (não troca de página nem altera configurações).<br>
-          • <b>Navegação de Telas:</b> Com a tela acordada, cada toque curto (&lt;900ms) avança ciclicamente entre as 6 telas:<br>
-          &nbsp;&nbsp;&nbsp;&nbsp;<b>Tela 0:</b> Status do solo (% e SECO/OK) e estado da válvula (ABERTA/FECHADA).<br>
-          &nbsp;&nbsp;&nbsp;&nbsp;<b>Tela 1:</b> Contagem regressiva até a próxima leitura ("EM 00H 58M") ou "IRRIGANDO AGORA".<br>
-          &nbsp;&nbsp;&nbsp;&nbsp;<b>Tela 2:</b> Limite mínimo de umidade para irrigar (Padrão 45%).<br>
-          &nbsp;&nbsp;&nbsp;&nbsp;<b>Tela 3:</b> Intervalo entre leituras (Padrão 1 hora).<br>
-          &nbsp;&nbsp;&nbsp;&nbsp;<b>Tela 4:</b> Tempo máximo de válvula aberta por ciclo (Padrão 30 segundos).<br>
-          &nbsp;&nbsp;&nbsp;&nbsp;<b>Tela 5:</b> Tensão medida da bateria e status ("ALIMENTACAO OK" ou "BATERIA BAIXA").<br>
-          • <b>Edição de Parâmetros:</b> Nas telas 2, 3 e 4, uma pressão longa (≥900ms) entra no modo de edição (exibe "EDITAR ..."). Toques curtos alternam entre os valores fixos do array. Uma nova pressão longa grava na EEPROM e sai do modo de edição.
-        </div>
-
-        <div>
-          <b>2. Automação de Irrigação & Segurança:</b><br>
-          • O solo é medido no boot e a cada <code>config.intervalHours</code>.<br>
-          • Se <code>soilPercent &lt;= config.humidityLimit</code> e a bateria for &gt;= 11.90V e o sensor não estiver em falha, a válvula é aberta por <code>config.valveSeconds</code>.<br>
-          • Ao término do tempo da válvula, ela é sempre desligada por segurança e a próxima leitura é agendada.<br>
-          • Se a bateria estiver &lt; 11.90V, a irrigação é bloqueada e uma mensagem de advertência é emitida no Monitor Serial.<br>
-          • Se o sensor ler RAW &le; 5 ou &ge; 1018, é detectada falha e o LCD indica "ERRO NO SENSOR".
-        </div>
-
-        <div>
-          <b>3. Dimensionamento Hidráulico e Energético:</b><br>
-          • Válvula de 12Vcc normalmente fechada consome ~18W (1.5A) durante os 30s de irrigação (apenas ~0.15 Wh por ciclo).<br>
-          • Consumo base contínuo: Arduino Uno + LCD (com sleep) + Sensor + Conversor Buck = ~11.1 Wh/dia.<br>
-          • Painel 20 Wp fornece ~65 Wh/dia em condições de sol médio (4.66 HSP com 70% rendimento). Autonomia garantida de mais de 24h em bateria 12V 9Ah.
-        </div>
-      </div>
-    </div>
-
   </section>
 
-  <!-- MODAL: SCHEMATIC IMAGE -->
-  <div class="modal-overlay" id="modalSchematic" onclick="closeModal('modalSchematic')">
-    <div class="modal-card" onclick="event.stopPropagation()">
-      <div class="modal-header">
-        <span style="font-weight:700">Diagrama Elétrico de Blocos (Tinkercad)</span>
-        <button class="modal-close" onclick="closeModal('modalSchematic')">&times;</button>
-      </div>
-      <div class="modal-body" style="align-items:center;">
-        <img src="./esquema_eletrico_tinkercad.png" alt="Esquema Elétrico Tinkercad" style="max-width:100%;height:auto;border-radius:6px;" onerror="this.src='https://placehold.co/800x600/1e293b/94a3b8?text=Esquema+Eletrico+Tinkercad'">
+  <!-- ==================== TAB 2: ESQUEMA ELÉTRICO FUNCIONAL & EXPLICATIVO ==================== -->
+  <section id="tabSchematicView" class="view-content">
+    <div class="card" style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+        <div>
+          <h2 style="font-size:1.1rem;font-weight:700;color:#fff;">⚡ Esquema Elétrico Funcional & Interativo (Kit Arduino + Relé 5V)</h2>
+          <p style="font-size:0.75rem;color:var(--text-muted);">Clique em qualquer componente para ver sua explicação técnica detalhada, conexões de bancada e cálculos de dimensionamento.</p>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;font-size:0.72rem;font-family:'Share Tech Mono';">
+          <span style="color:#ef4444">■ 5Vcc Lógico</span>
+          <span style="color:#eab308">■ 12Vcc Bateria</span>
+          <span style="color:#06b6d4">■ Sinais Digitais/Analógicos</span>
+          <span style="color:#64748b">■ GND Comum</span>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- JAVASCRIPT SIMULATION ENGINE -->
+    <!-- CANVAS / SVG INTERATIVO DO CIRCUITO -->
+    <div class="schematic-canvas-container">
+      <svg class="schematic-svg" viewBox="0 0 1100 560">
+        
+        <!-- LINHAS / FIOS ELÉTRICOS COM ANIMAÇÃO DE FLUXO -->
+        <g id="schematicWires">
+          <!-- GND Comum Principal -->
+          <path d="M 120 480 L 1020 480" class="schematic-wire wire-gnd" />
+          <text x="130" y="475" fill="#64748b" font-size="11" font-family="'Share Tech Mono'">GND BARRAMENTO COMUM</text>
+
+          <!-- Painel Solar -> Controlador SUN21 -->
+          <path d="M 130 140 L 260 140" class="schematic-wire wire-12v wire-active" />
+          <path d="M 130 170 L 260 170" class="schematic-wire wire-gnd" />
+
+          <!-- SUN21 -> Bateria 12V -->
+          <path d="M 330 220 L 330 360 L 220 360" class="schematic-wire wire-12v wire-active" />
+          <path d="M 350 220 L 350 390 L 220 390" class="schematic-wire wire-gnd" />
+
+          <!-- Bateria 12V -> Divisor Resistivo 100k/33k -->
+          <path d="M 220 360 L 460 360" class="schematic-wire wire-12v" />
+          <!-- Divisor -> A1 Arduino -->
+          <path d="M 510 360 L 610 360 L 610 300" class="schematic-wire wire-signal" />
+
+          <!-- Bateria 12V -> Buck 12V->5V -->
+          <path d="M 220 360 L 220 440 L 440 440" class="schematic-wire wire-12v" />
+          
+          <!-- Buck 5V -> Arduino Uno 5V -->
+          <path d="M 520 440 L 650 440 L 650 310" class="schematic-wire wire-power" />
+
+          <!-- Arduino D2 -> Botão -->
+          <path d="M 610 140 L 510 140" class="schematic-wire wire-signal" />
+
+          <!-- Arduino A0 -> Sensor LM393 AO -->
+          <path d="M 610 260 L 510 260" class="schematic-wire wire-signal" />
+
+          <!-- Arduino D9 -> Módulo Relé 5V (IN) -->
+          <path d="M 750 140 L 850 140" class="schematic-wire wire-signal" id="wireD9Relay" />
+
+          <!-- Módulo Relé COM -> +12V Bateria -->
+          <path d="M 920 180 L 920 220 L 220 220" class="schematic-wire wire-12v" />
+
+          <!-- Módulo Relé NO -> Solenóide 12V (+) -->
+          <path d="M 970 180 L 1000 180 L 1000 270" class="schematic-wire wire-12v" id="wireRelaySol" />
+
+          <!-- Solenoide (-) -> GND -->
+          <path d="M 1000 370 L 1000 480" class="schematic-wire wire-gnd" />
+
+          <!-- Arduino D10, D11, D12, D3-D6 -> LCD 16x2 -->
+          <path d="M 750 180 L 840 180 L 840 380 L 760 380" class="schematic-wire wire-signal" />
+        </g>
+
+        <!-- COMPONENTES (CLICÁVEIS) -->
+        
+        <!-- 1. PAINEL SOLAR 20Wp -->
+        <g class="comp-box" onclick="showExplainer('solar')" transform="translate(30, 90)">
+          <rect width="100" height="120" rx="6" fill="#1e293b" stroke="#f59e0b" stroke-width="2" />
+          <text x="50" y="30" fill="#fbbf24" font-size="12" font-weight="700" text-anchor="middle">PAINEL SOLAR</text>
+          <text x="50" y="50" fill="#fff" font-size="14" font-weight="700" text-anchor="middle">20 Wp</text>
+          <text x="50" y="80" fill="#94a3b8" font-size="9" text-anchor="middle">Vmp: 18.0 V</text>
+          <text x="50" y="95" fill="#94a3b8" font-size="9" text-anchor="middle">Imp: 1.11 A</text>
+          <circle cx="100" cy="50" r="4" fill="#f59e0b" />
+          <circle cx="100" cy="80" r="4" fill="#64748b" />
+        </g>
+
+        <!-- 2. CONTROLADOR SUN21 PWM -->
+        <g class="comp-box" onclick="showExplainer('sun21')" transform="translate(260, 80)">
+          <rect width="130" height="140" rx="8" fill="#1e3a8a" stroke="#60a5fa" stroke-width="2" />
+          <text x="65" y="25" fill="#fff" font-size="11" font-weight="700" text-anchor="middle">SUN21 CCS-P1024</text>
+          <text x="65" y="42" fill="#93c5fd" font-size="9" text-anchor="middle">Controlador Solar PWM 10A</text>
+          <!-- Display replica -->
+          <rect x="20" y="55" width="90" height="30" rx="4" fill="#60a5fa" />
+          <text x="65" y="75" fill="#030712" font-size="11" font-weight="700" text-anchor="middle" id="schemSunText">14.1V [PWM]</text>
+          <!-- Terminais -->
+          <text x="20" y="115" fill="#fbbf24" font-size="9">PV+</text>
+          <text x="45" y="115" fill="#64748b" font-size="9">PV-</text>
+          <text x="70" y="115" fill="#f87171" font-size="9">BAT+</text>
+          <text x="95" y="115" fill="#64748b" font-size="9">BAT-</text>
+        </g>
+
+        <!-- 3. BATERIA 12V 9Ah -->
+        <g class="comp-box" onclick="showExplainer('battery')" transform="translate(90, 320)">
+          <rect width="130" height="110" rx="6" fill="#0f172a" stroke="#10b981" stroke-width="2" />
+          <text x="65" y="30" fill="#34d399" font-size="12" font-weight="700" text-anchor="middle">BATERIA MOTO</text>
+          <text x="65" y="52" fill="#fff" font-size="14" font-weight="700" text-anchor="middle">12V / 9Ah</text>
+          <text x="65" y="78" fill="#94a3b8" font-size="10" text-anchor="middle">Chumbo-Ácida</text>
+          <text x="65" y="95" fill="#38bdf8" font-size="9" text-anchor="middle" id="schemBatVolt">12.4 Vcc</text>
+        </g>
+
+        <!-- 4. DIVISOR RESISTIVO 100k / 33k -->
+        <g class="comp-box" onclick="showExplainer('divider')" transform="translate(430, 325)">
+          <rect width="80" height="70" rx="6" fill="#131b2e" stroke="#38bdf8" stroke-width="1.5" />
+          <text x="40" y="20" fill="#38bdf8" font-size="9" font-weight="700" text-anchor="middle">DIVISOR A1</text>
+          <text x="40" y="38" fill="#fff" font-size="9" text-anchor="middle">R1: 100 kΩ</text>
+          <text x="40" y="52" fill="#fff" font-size="9" text-anchor="middle">R2: 33 kΩ</text>
+          <text x="40" y="65" fill="#fbbf24" font-size="8" text-anchor="middle">Ratio: 4.03</text>
+        </g>
+
+        <!-- 5. BUCK CONVERTER 12V -> 5V -->
+        <g class="comp-box" onclick="showExplainer('buck')" transform="translate(440, 415)">
+          <rect width="80" height="50" rx="6" fill="#1e293b" stroke="#f43f5e" stroke-width="1.5" />
+          <text x="40" y="20" fill="#fda4af" font-size="9" font-weight="700" text-anchor="middle">BUCK DC-DC</text>
+          <text x="40" y="38" fill="#fff" font-size="10" font-weight="700" text-anchor="middle">12V ➔ 5.0V</text>
+        </g>
+
+        <!-- 6. BOTÃO D2 -->
+        <g class="comp-box" onclick="showExplainer('button')" transform="translate(430, 115)">
+          <rect width="80" height="50" rx="6" fill="#1e293b" stroke="#06b6d4" stroke-width="1.5" />
+          <text x="40" y="22" fill="#38bdf8" font-size="9" font-weight="700" text-anchor="middle">BOTÃO (D2)</text>
+          <circle cx="40" cy="36" r="8" fill="#475569" stroke="#94a3b8" />
+        </g>
+
+        <!-- 7. SENSOR KIT LM393 -->
+        <g class="comp-box" onclick="showExplainer('sensor')" transform="translate(410, 220)">
+          <rect width="100" height="80" rx="6" fill="#064e3b" stroke="#10b981" stroke-width="1.5" />
+          <text x="50" y="20" fill="#6ee7b7" font-size="9" font-weight="700" text-anchor="middle">SENSOR KIT LM393</text>
+          <text x="50" y="38" fill="#fff" font-size="9" text-anchor="middle">Garfo Resistivo</text>
+          <text x="50" y="55" fill="#94a3b8" font-size="8" text-anchor="middle">AO ➔ A0 Arduino</text>
+          <text x="50" y="70" fill="#94a3b8" font-size="8" text-anchor="middle">DO (Trimpot)</text>
+        </g>
+
+        <!-- 8. ARDUINO UNO R3 -->
+        <g class="comp-box" onclick="showExplainer('arduino')" transform="translate(610, 90)">
+          <rect width="140" height="230" rx="10" fill="#005c53" stroke="#00b4d8" stroke-width="2.5" />
+          <text x="70" y="30" fill="#fff" font-size="13" font-weight="700" text-anchor="middle">ARDUINO UNO R3</text>
+          <text x="70" y="48" fill="#a7f3d0" font-size="9" text-anchor="middle">ATmega328P</text>
+
+          <!-- Pinos Esquerdos -->
+          <text x="15" y="80" fill="#fff" font-size="9">D2 (Botão)</text>
+          <text x="15" y="105" fill="#fff" font-size="9">A0 (Sensor Solo)</text>
+          <text x="15" y="130" fill="#fff" font-size="9">A1 (Divisor Bat)</text>
+          <text x="15" y="170" fill="#f87171" font-size="9">5V (Alimentação)</text>
+          <text x="15" y="195" fill="#64748b" font-size="9">GND (Terra)</text>
+
+          <!-- Pinos Direitos -->
+          <text x="80" y="80" fill="#38bdf8" font-size="9">D9 (Relé)</text>
+          <text x="80" y="105" fill="#38bdf8" font-size="9">D10 (Backlight)</text>
+          <text x="80" y="130" fill="#38bdf8" font-size="9">D11/D12 (LCD)</text>
+          <text x="80" y="155" fill="#38bdf8" font-size="9">D3-D6 (Dados)</text>
+        </g>
+
+        <!-- 9. MÓDULO RELÉ 5V (SONGLE) -->
+        <g class="comp-box" onclick="showExplainer('relay')" transform="translate(850, 90)">
+          <rect width="120" height="120" rx="8" fill="#1e3a8a" stroke="#38bdf8" stroke-width="2" />
+          <text x="60" y="24" fill="#fff" font-size="11" font-weight="700" text-anchor="middle">MÓDULO RELÉ 5V</text>
+          <text x="60" y="40" fill="#93c5fd" font-size="8" text-anchor="middle">Optoacoplado PC817</text>
+          <!-- Caixa azul do relé Songle -->
+          <rect x="25" y="50" width="70" height="40" rx="4" fill="#0284c7" />
+          <text x="60" y="74" fill="#fff" font-size="9" font-weight="700" text-anchor="middle" id="schemRelayLabel">SONGLE 5V</text>
+          <!-- Terminais -->
+          <text x="25" y="108" fill="#f87171" font-size="8">COM</text>
+          <text x="60" y="108" fill="#4ade80" font-size="8">NO</text>
+          <text x="90" y="108" fill="#94a3b8" font-size="8">NC</text>
+        </g>
+
+        <!-- 10. VÁLVULA SOLENÓIDE 12V NC -->
+        <g class="comp-box" onclick="showExplainer('solenoid')" transform="translate(930, 270)">
+          <rect width="110" height="100" rx="8" fill="#334155" stroke="#f59e0b" stroke-width="2" />
+          <text x="55" y="25" fill="#fde68a" font-size="10" font-weight="700" text-anchor="middle">SOLENÓIDE 12V</text>
+          <text x="55" y="42" fill="#fff" font-size="9" text-anchor="middle">Normalmente Fechada</text>
+          <!-- Bobina e Tubo -->
+          <rect x="35" y="52" width="40" height="30" rx="4" fill="#0f172a" stroke="#eab308" />
+          <text x="55" y="70" fill="#eab308" font-size="8" font-weight="700" text-anchor="middle" id="schemSolState">FECHADA</text>
+          <text x="55" y="94" fill="#94a3b8" font-size="8" text-anchor="middle">Bobina 18W (1.5A)</text>
+        </g>
+
+        <!-- 11. DISPLAY LCD 16X2 -->
+        <g class="comp-box" onclick="showExplainer('lcd')" transform="translate(610, 360)">
+          <rect width="150" height="90" rx="8" fill="#0f172a" stroke="#22d3ee" stroke-width="2" />
+          <text x="75" y="22" fill="#22d3ee" font-size="10" font-weight="700" text-anchor="middle">LCD 16x2 HD44780</text>
+          <rect x="15" y="32" width="120" height="40" rx="4" fill="#0284c7" />
+          <text x="75" y="55" fill="#fff" font-size="10" font-family="'Share Tech Mono'" text-anchor="middle">HORTA AUTONOMA</text>
+          <text x="75" y="85" fill="#94a3b8" font-size="8" text-anchor="middle">Interface Paralela 4-bit</text>
+        </g>
+
+      </svg>
+    </div>
+
+    <!-- CARTÃO EXPLICATIVO INTERATIVO -->
+    <div id="schematicExplainer" class="schematic-explainer-card">
+      <h3 id="expTitle" style="color:var(--accent);font-size:0.95rem;margin-bottom:6px;">Clique em qualquer bloco do circuito acima para ver a explicação técnica completa.</h3>
+      <div id="expBody" style="color:var(--text-muted);font-size:0.8rem;line-height:1.5;">
+        O diagrama representa a bancada e a instalação física real da horta vertical, incluindo o <b>Módulo Relé de 5V</b> comandando a carga pesada de 12V da solenóide, o <b>Sensor Resistivo com comparador LM393</b> do kit de Arduino, o <b>Controlador Solar SUN21 PWM</b> e o divisor de tensão resistivo para monitoramento seguro da bateria.
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== TAB 3: SIMULADOR DE CÓDIGO (TINKERCAD IDE) ==================== -->
+  <section id="tabCodeEditor" class="view-content">
+    <div class="code-editor-layout">
+      
+      <!-- EDITOR DE CÓDIGO COM LINHAS -->
+      <div class="code-editor-container">
+        <div class="code-toolbar">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:0.8rem;font-weight:700;color:#fff;">📄 horta_vertical_rele.ino</span>
+            <span class="badge-fw" style="color:#60a5fa;border-color:#2563eb;">C++ (Arduino AVR)</span>
+          </div>
+          
+          <div style="display:flex;gap:8px;">
+            <button class="btn-tool" onclick="compileAndRunCode()" style="background:#059669;border-color:#10b981;font-weight:700;color:#fff;">
+              ▶️ Compilar & Atualizar Arduino
+            </button>
+            <button class="btn-tool" onclick="resetDefaultCode()">
+              🔄 Restaurar Padrão
+            </button>
+            <button class="btn-tool" onclick="copyEditorCode()">
+              📋 Copiar
+            </button>
+          </div>
+        </div>
+
+        <div class="code-editor-inner">
+          <div id="codeLineNumbers" class="code-line-numbers"></div>
+          <textarea id="codeTextarea" class="code-textarea" spellcheck="false" oninput="updateLineNumbers()"></textarea>
+        </div>
+
+        <div class="compiler-output-box" id="compilerOutput">
+          [AVR-GCC] Pronto para compilar. Clique em "Compilar & Atualizar Arduino" para enviar alterações ao simulador.
+        </div>
+      </div>
+
+      <!-- PAINEL LATERAL DE PARÂMETROS RÁPIDOS & VARIÁVEIS -->
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="card">
+          <div class="card-title">
+            <span>⚙️ Ajuste Rápido de Variáveis</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;font-size:0.75rem;">
+            
+            <div>
+              <label style="color:var(--text-muted);display:flex;justify-content:space-between;">
+                <span>Umidade Mínima (humidityLimit):</span>
+                <b id="lblCfgHum" style="color:var(--accent)">45%</b>
+              </label>
+              <input type="range" min="20" max="70" step="5" value="45" id="sliderCfgHum" oninput="quickTuneVar('hum', this.value)" style="width:100%;margin-top:4px;">
+            </div>
+
+            <div>
+              <label style="color:var(--text-muted);display:flex;justify-content:space-between;">
+                <span>Intervalo Leituras (intervalHours):</span>
+                <b id="lblCfgInt" style="color:var(--accent)">1 h</b>
+              </label>
+              <input type="range" min="1" max="12" step="1" value="1" id="sliderCfgInt" oninput="quickTuneVar('int', this.value)" style="width:100%;margin-top:4px;">
+            </div>
+
+            <div>
+              <label style="color:var(--text-muted);display:flex;justify-content:space-between;">
+                <span>Tempo Válvula (valveSeconds):</span>
+                <b id="lblCfgVlv" style="color:var(--accent)">30 s</b>
+              </label>
+              <input type="range" min="5" max="180" step="5" value="30" id="sliderCfgVlv" oninput="quickTuneVar('vlv', this.value)" style="width:100%;margin-top:4px;">
+            </div>
+
+            <div>
+              <label style="color:var(--text-muted);display:flex;justify-content:space-between;">
+                <span>Corte Bateria (BATTERY_CUTOFF_V):</span>
+                <b id="lblCfgBat" style="color:var(--danger)">11.90 V</b>
+              </label>
+              <input type="range" min="110" max="125" step="1" value="119" id="sliderCfgBat" oninput="quickTuneVar('bat', this.value/10)" style="width:100%;margin-top:4px;">
+            </div>
+
+            <div style="padding-top:6px;border-top:1px solid var(--border-color);">
+              <label style="color:var(--text-muted);display:block;margin-bottom:4px;">Lógica de Disparo do Relé:</label>
+              <select id="selRelayLogic" onchange="quickTuneVar('relayLogic', this.value)" style="width:100%;background:#090e1a;border:1px solid var(--border-color);color:#fff;padding:6px;border-radius:4px;font-size:0.75rem;">
+                <option value="HIGH">Ativo em HIGH (digitalWrite HIGH liga relé)</option>
+                <option value="LOW">Ativo em LOW (Módulos relé invertidos comuns)</option>
+              </select>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="card" style="font-size:0.75rem;line-height:1.45;color:var(--text-muted);">
+          <div class="card-title" style="margin-bottom:6px;">💡 Dicas de Programação:</div>
+          • Altere parâmetros diretamente no código ou use os sliders rápidos.<br>
+          • Ao clicar em <b>Compilar</b>, o simulador analisa a sintaxe e atualiza a memória do microcontrolador virtual imediatamente.<br>
+          • A pinagem pode ser alterada diretamente nas variáveis <code>const byte PIN_...</code>.
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== TAB 4: HIDRÁULICA & 9 PRATELEIRAS CUSTOMIZÁVEIS ==================== -->
+  <section id="tabHydraulicsConfig" class="view-content">
+    <div class="card" style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+        <div>
+          <h2 style="font-size:1.1rem;font-weight:700;color:#fff;">💧 Hidráulica Modular, Válvulas & Personalização das 9 Prateleiras</h2>
+          <p style="font-size:0.75rem;color:var(--text-muted);">Conecte mangueiras, regule torneiras e defina as espécies cultivadas em cada andar dos 3 paletes reais.</p>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-tool" onclick="resetHydraulics()">🔄 Restaurar Padrão de Vazões</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="shelf-customizer-grid">
+
+      <!-- PALETE 1: FOLHAGENS (ESQUERDA) -->
+      <div class="pallet-config-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-color);padding-bottom:8px;">
+          <h3 style="font-size:0.85rem;color:#fde68a;">🪴 Palete 1: Folhagens & Jiboias</h3>
+          <span class="badge-fw" id="p1TotalLhBadge">6.0 L/h</span>
+        </div>
+
+        <!-- Prateleira 1 -->
+        <div class="shelf-item-card">
+          <div class="shelf-item-header">
+            <span>P1 - Prateleira Superior</span>
+            <label style="font-size:0.7rem;color:var(--accent);display:flex;align-items:center;gap:4px;">
+              <input type="checkbox" id="chkP1S1" checked onchange="updateShelfConfig(1,1)"> Mangueira Ligada
+            </label>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <select id="selPlantP1S1" onchange="updateShelfConfig(1,1)" style="flex:1;background:#162035;border:1px solid var(--border-color);color:#fff;padding:4px;border-radius:4px;font-size:0.72rem;">
+              <option value="jiboia" selected>🌿 Jiboia Pendente (Umidade 50-70%)</option>
+              <option value="samambaia">🍃 Samambaia Americana (60-80%)</option>
+              <option value="folhagem_roxa">🌱 Folhagem Roxa (45-65%)</option>
+            </select>
+          </div>
+          <div style="font-size:0.7rem;display:flex;justify-content:space-between;color:var(--text-muted);align-items:center;">
+            <span>Vazão Gotejador:</span>
+            <span id="lblFlowP1S1" style="font-weight:700;color:#38bdf8">2.0 L/h</span>
+          </div>
+          <input type="range" min="0" max="35" value="20" step="1" id="flowP1S1" oninput="updateShelfConfig(1,1)">
+        </div>
+
+        <!-- Prateleira 2 -->
+        <div class="shelf-item-card">
+          <div class="shelf-item-header">
+            <span>P1 - Prateleira Média</span>
+            <label style="font-size:0.7rem;color:var(--accent);display:flex;align-items:center;gap:4px;">
+              <input type="checkbox" id="chkP1S2" checked onchange="updateShelfConfig(1,2)"> Mangueira Ligada
+            </label>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <select id="selPlantP1S2" onchange="updateShelfConfig(1,2)" style="flex:1;background:#162035;border:1px solid var(--border-color);color:#fff;padding:4px;border-radius:4px;font-size:0.72rem;">
+              <option value="jiboia">🌿 Jiboia Pendente (Umidade 50-70%)</option>
+              <option value="samambaia" selected>🍃 Samambaia Americana (60-80%)</option>
+              <option value="folhagem_roxa">🌱 Folhagem Roxa (45-65%)</option>
+            </select>
+          </div>
+          <div style="font-size:0.7rem;display:flex;justify-content:space-between;color:var(--text-muted);align-items:center;">
+            <span>Vazão Gotejador:</span>
+            <span id="lblFlowP1S2" style="font-weight:700;color:#38bdf8">2.0 L/h</span>
+          </div>
+          <input type="range" min="0" max="35" value="20" step="1" id="flowP1S2" oninput="updateShelfConfig(1,2)">
+        </div>
+
+        <!-- Prateleira 3 -->
+        <div class="shelf-item-card">
+          <div class="shelf-item-header">
+            <span>P1 - Prateleira Inferior</span>
+            <label style="font-size:0.7rem;color:var(--accent);display:flex;align-items:center;gap:4px;">
+              <input type="checkbox" id="chkP1S3" checked onchange="updateShelfConfig(1,3)"> Mangueira Ligada
+            </label>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <select id="selPlantP1S3" onchange="updateShelfConfig(1,3)" style="flex:1;background:#162035;border:1px solid var(--border-color);color:#fff;padding:4px;border-radius:4px;font-size:0.72rem;">
+              <option value="jiboia">🌿 Jiboia Pendente (Umidade 50-70%)</option>
+              <option value="samambaia">🍃 Samambaia Americana (60-80%)</option>
+              <option value="folhagem_roxa" selected>🌱 Folhagem Roxa (45-65%)</option>
+            </select>
+          </div>
+          <div style="font-size:0.7rem;display:flex;justify-content:space-between;color:var(--text-muted);align-items:center;">
+            <span>Vazão Gotejador:</span>
+            <span id="lblFlowP1S3" style="font-weight:700;color:#38bdf8">2.0 L/h</span>
+          </div>
+          <input type="range" min="0" max="35" value="20" step="1" id="flowP1S3" oninput="updateShelfConfig(1,3)">
+        </div>
+      </div>
+
+      <!-- PALETE 2: HORTALIÇAS & SENSOR (CENTRO ELEVADO) -->
+      <div class="pallet-config-card" style="border-color:#0284c7;">
+        <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-color);padding-bottom:8px;">
+          <h3 style="font-size:0.85rem;color:#38bdf8;">🥗 Palete 2: Hortaliças & Sonda A0</h3>
+          <span class="badge-fw" id="p2TotalLhBadge">3.0 L/h</span>
+        </div>
+
+        <!-- Prateleira 1 -->
+        <div class="shelf-item-card">
+          <div class="shelf-item-header">
+            <span>P2 - Prateleira Superior</span>
+            <label style="font-size:0.7rem;color:var(--accent);display:flex;align-items:center;gap:4px;">
+              <input type="checkbox" id="chkP2S1" checked onchange="updateShelfConfig(2,1)"> Mangueira Ligada
+            </label>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <select id="selPlantP2S1" onchange="updateShelfConfig(2,1)" style="flex:1;background:#162035;border:1px solid var(--border-color);color:#fff;padding:4px;border-radius:4px;font-size:0.72rem;">
+              <option value="alface" selected>🥗 Alface Crespa (Umidade 60-75%)</option>
+              <option value="manjericao">🌿 Manjericão Roxo/Verde (45-65%)</option>
+              <option value="alecrim">🌾 Alecrim e Tomilho (35-50%)</option>
+            </select>
+          </div>
+          <div style="font-size:0.7rem;display:flex;justify-content:space-between;color:var(--text-muted);align-items:center;">
+            <span>Vazão Gotejador:</span>
+            <span id="lblFlowP2S1" style="font-weight:700;color:#38bdf8">1.0 L/h</span>
+          </div>
+          <input type="range" min="0" max="35" value="10" step="1" id="flowP2S1" oninput="updateShelfConfig(2,1)">
+        </div>
+
+        <!-- Prateleira 2 (Com Sensor) -->
+        <div class="shelf-item-card" style="border-color:var(--accent);">
+          <div class="shelf-item-header">
+            <span style="color:var(--accent);font-weight:700;">P2 - Vaso Sonda A0</span>
+            <label style="font-size:0.7rem;color:var(--accent);display:flex;align-items:center;gap:4px;">
+              <input type="checkbox" id="chkP2S2" checked onchange="updateShelfConfig(2,2)"> Mangueira Ligada
+            </label>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <select id="selPlantP2S2" onchange="updateShelfConfig(2,2)" style="flex:1;background:#162035;border:1px solid var(--border-color);color:#fff;padding:4px;border-radius:4px;font-size:0.72rem;">
+              <option value="manjericao" selected>🌿 Manjericão (Vaso Referência A0)</option>
+              <option value="alface">🥗 Alface Crespa (60-75%)</option>
+              <option value="alecrim">🌾 Alecrim (35-50%)</option>
+            </select>
+          </div>
+          <div style="font-size:0.7rem;display:flex;justify-content:space-between;color:var(--text-muted);align-items:center;">
+            <span>Vazão Gotejador:</span>
+            <span id="lblFlowP2S2" style="font-weight:700;color:#38bdf8">1.0 L/h</span>
+          </div>
+          <input type="range" min="0" max="35" value="10" step="1" id="flowP2S2" oninput="updateShelfConfig(2,2)">
+        </div>
+
+        <!-- Prateleira 3 -->
+        <div class="shelf-item-card">
+          <div class="shelf-item-header">
+            <span>P2 - Prateleira Inferior</span>
+            <label style="font-size:0.7rem;color:var(--accent);display:flex;align-items:center;gap:4px;">
+              <input type="checkbox" id="chkP2S3" checked onchange="updateShelfConfig(2,3)"> Mangueira Ligada
+            </label>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <select id="selPlantP2S3" onchange="updateShelfConfig(2,3)" style="flex:1;background:#162035;border:1px solid var(--border-color);color:#fff;padding:4px;border-radius:4px;font-size:0.72rem;">
+              <option value="alecrim" selected>🌾 Alecrim e Tomilho (Umidade 35-50%)</option>
+              <option value="alface">🥗 Alface (60-75%)</option>
+              <option value="manjericao">🌿 Manjericão (45-65%)</option>
+            </select>
+          </div>
+          <div style="font-size:0.7rem;display:flex;justify-content:space-between;color:var(--text-muted);align-items:center;">
+            <span>Vazão Gotejador:</span>
+            <span id="lblFlowP2S3" style="font-weight:700;color:#38bdf8">1.0 L/h</span>
+          </div>
+          <input type="range" min="0" max="35" value="10" step="1" id="flowP2S3" oninput="updateShelfConfig(2,3)">
+        </div>
+      </div>
+
+      <!-- PALETE 3: FLORES & BAIXA DEMANDA (DIREITA) -->
+      <div class="pallet-config-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-color);padding-bottom:8px;">
+          <h3 style="font-size:0.85rem;color:#fbcfe8;">🌸 Palete 3: Flores & Suculentas</h3>
+          <span class="badge-fw" id="p3TotalLhBadge">1.5 L/h</span>
+        </div>
+
+        <!-- Prateleira 1 -->
+        <div class="shelf-item-card">
+          <div class="shelf-item-header">
+            <span>P3 - Prateleira Superior</span>
+            <label style="font-size:0.7rem;color:var(--accent);display:flex;align-items:center;gap:4px;">
+              <input type="checkbox" id="chkP3S1" checked onchange="updateShelfConfig(3,1)"> Mangueira Ligada
+            </label>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <select id="selPlantP3S1" onchange="updateShelfConfig(3,1)" style="flex:1;background:#162035;border:1px solid var(--border-color);color:#fff;padding:4px;border-radius:4px;font-size:0.72rem;">
+              <option value="petunia" selected>🌸 Petúnias Coloridas (Umidade 40-55%)</option>
+              <option value="onze_horas">🌼 Onze-Horas (35-50%)</option>
+              <option value="suculenta">🌵 Suculentas e Cactos (15-30%)</option>
+            </select>
+          </div>
+          <div style="font-size:0.7rem;display:flex;justify-content:space-between;color:var(--text-muted);align-items:center;">
+            <span>Vazão Gotejador:</span>
+            <span id="lblFlowP3S1" style="font-weight:700;color:#38bdf8">0.5 L/h</span>
+          </div>
+          <input type="range" min="0" max="35" value="5" step="1" id="flowP3S1" oninput="updateShelfConfig(3,1)">
+        </div>
+
+        <!-- Prateleira 2 -->
+        <div class="shelf-item-card">
+          <div class="shelf-item-header">
+            <span>P3 - Prateleira Média</span>
+            <label style="font-size:0.7rem;color:var(--accent);display:flex;align-items:center;gap:4px;">
+              <input type="checkbox" id="chkP3S2" checked onchange="updateShelfConfig(3,2)"> Mangueira Ligada
+            </label>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <select id="selPlantP3S2" onchange="updateShelfConfig(3,2)" style="flex:1;background:#162035;border:1px solid var(--border-color);color:#fff;padding:4px;border-radius:4px;font-size:0.72rem;">
+              <option value="onze_horas" selected>🌼 Onze-Horas (Umidade 35-50%)</option>
+              <option value="petunia">🌸 Petúnias (40-55%)</option>
+              <option value="suculenta">🌵 Suculentas (15-30%)</option>
+            </select>
+          </div>
+          <div style="font-size:0.7rem;display:flex;justify-content:space-between;color:var(--text-muted);align-items:center;">
+            <span>Vazão Gotejador:</span>
+            <span id="lblFlowP3S2" style="font-weight:700;color:#38bdf8">0.5 L/h</span>
+          </div>
+          <input type="range" min="0" max="35" value="5" step="1" id="flowP3S2" oninput="updateShelfConfig(3,2)">
+        </div>
+
+        <!-- Prateleira 3 -->
+        <div class="shelf-item-card">
+          <div class="shelf-item-header">
+            <span>P3 - Prateleira Inferior</span>
+            <label style="font-size:0.7rem;color:var(--accent);display:flex;align-items:center;gap:4px;">
+              <input type="checkbox" id="chkP3S3" checked onchange="updateShelfConfig(3,3)"> Mangueira Ligada
+            </label>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <select id="selPlantP3S3" onchange="updateShelfConfig(3,3)" style="flex:1;background:#162035;border:1px solid var(--border-color);color:#fff;padding:4px;border-radius:4px;font-size:0.72rem;">
+              <option value="suculenta" selected>🌵 Suculentas e Cactos (Umidade 15-30%)</option>
+              <option value="onze_horas">🌼 Onze-Horas (35-50%)</option>
+              <option value="petunia">🌸 Petúnias (40-55%)</option>
+            </select>
+          </div>
+          <div style="font-size:0.7rem;display:flex;justify-content:space-between;color:var(--text-muted);align-items:center;">
+            <span>Vazão Gotejador:</span>
+            <span id="lblFlowP3S3" style="font-weight:700;color:#38bdf8">0.5 L/h</span>
+          </div>
+          <input type="range" min="0" max="35" value="5" step="1" id="flowP3S3" oninput="updateShelfConfig(3,3)">
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== TAB 5: CENÁRIOS DE TESTE ==================== -->
+  <section id="tabScenarios" class="view-content">
+    <div class="card" style="margin-bottom:14px;">
+      <h2 style="font-size:1.1rem;font-weight:700;color:#fff;">🧪 Injeção de Falhas e Cenários Rápidos</h2>
+      <p style="font-size:0.75rem;color:var(--text-muted);">Clique em qualquer cartão para injetar condições imediatas no Arduino e observar as respostas do relé e do LCD.</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));gap:12px;">
+      <div class="card" style="cursor:pointer;" onclick="applyScenario('dry_soil')">
+        <h4 style="color:#fff;">🌱 Solo Seco (RAW 755 -> 10%)</h4>
+        <p style="font-size:0.72rem;color:var(--text-muted);margin-top:4px;">Abaixo do limite de 45%. No próximo ciclo, o relé fecha (click!), abrindo a válvula de 12V por 30s.</p>
+      </div>
+
+      <div class="card" style="cursor:pointer;" onclick="applyScenario('wet_soil')">
+        <h4 style="color:#fff;">💧 Solo Úmido (RAW 462 -> 75%)</h4>
+        <p style="font-size:0.72rem;color:var(--text-muted);margin-top:4px;">Acima do limiar. A solenóide permanece fechada e agenda a próxima leitura periódica.</p>
+      </div>
+
+      <div class="card" style="cursor:pointer;" onclick="applyScenario('sensor_fault_open')">
+        <h4 style="color:var(--danger);">⚠️ Falha: Cabo do Sensor Desconectado</h4>
+        <p style="font-size:0.72rem;color:var(--text-muted);margin-top:4px;">RAW atinge 1023 (limiar >= 1018). LCD exibe "ERRO NO SENSOR" e bloqueia o relé da água.</p>
+      </div>
+
+      <div class="card" style="cursor:pointer;" onclick="applyScenario('sensor_fault_short')">
+        <h4 style="color:var(--danger);">⚠️ Falha: Garfo em Curto com GND</h4>
+        <p style="font-size:0.72rem;color:var(--text-muted);margin-top:4px;">RAW vai a 0 (limiar <= 5). Proteção de software impede encharcamento da horta.</p>
+      </div>
+
+      <div class="card" style="cursor:pointer;" onclick="applyScenario('low_battery')">
+        <h4 style="color:var(--solar);">🪫 Bateria Baixa (11.50V)</h4>
+        <p style="font-size:0.72rem;color:var(--text-muted);margin-top:4px;">Tensão abaixo de 11.90V. Bloqueia nova irrigação com aviso no Serial Monitor.</p>
+      </div>
+
+      <div class="card" style="cursor:pointer;" onclick="applyScenario('sleep_lcd')">
+        <h4 style="color:#38bdf8;">💡 Forçar Inatividade (LCD Sleep)</h4>
+        <p style="font-size:0.72rem;color:var(--text-muted);margin-top:4px;">Avança 30s sem toques. Desliga o backlight. O primeiro clique apenas acorda a tela.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== TAB 6: FOTOS REAIS ==================== -->
+  <section id="tabPhotos" class="view-content">
+    <div class="card" style="margin-bottom:14px;">
+      <h2 style="font-size:1.1rem;font-weight:700;color:#fff;">📸 Registros Fotográficos da Instalação Real (3 Paletes)</h2>
+      <p style="font-size:0.75rem;color:var(--text-muted);">As dimensões, arranjo e prateleiras do simulador foram modeladas a partir dessas imagens da bancada física.</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="card">
+        <img src="./WhatsApp Image 2026-11-09 at 11.36.28 (1).jpeg" alt="Estrutura de Paletes vazia" style="width:100%;height:320px;object-fit:cover;border-radius:6px;" onerror="this.src='https://placehold.co/600x400/1e293b/94a3b8?text=Estrutura+dos+3+Paletes+Vazia'">
+        <p style="font-size:0.75rem;color:var(--text-muted);margin-top:8px;"><b>Estrutura Inicial:</b> 3 paletes de madeira instalados na parede de alvenaria antes do plantio.</p>
+      </div>
+      <div class="card">
+        <img src="./WhatsApp Image 2026-11-09 at 11.36.28.jpeg" alt="Horta plantada e viçosa" style="width:100%;height:320px;object-fit:cover;border-radius:6px;" onerror="this.src='https://placehold.co/600x400/1e293b/94a3b8?text=Horta+Vertical+Montada+e+Plantada'">
+        <p style="font-size:0.75rem;color:var(--text-muted);margin-top:8px;"><b>Horta Concluída:</b> Jiboias pendentes à esquerda, hortaliças e ervas no centro, flores e suculentas à direita.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- JAVASCRIPT DO SIMULADOR COMPLETO -->
   <script>
     /* =========================================================================
-       HORTA VERTICAL AUTÔNOMA - MOTOR DE SIMULAÇÃO (FIRMWARE & FÍSICA)
+       MOTOR DO SIMULADOR (FIRMWARE ARDUINO, RELÉ 5V, LCD 5X8 E HIDRÁULICA)
        ========================================================================= */
 
-    // Constantes de Calibração idênticas a horta_vertical.ino
-    const SOIL_DRY_RAW = 800;
-    const SOIL_WET_RAW = 350;
-    const ADC_REFERENCE_V = 5.00;
-    const BATTERY_R_TOP = 100000.0;
-    const BATTERY_R_BOTTOM = 33000.0;
-    const BATTERY_CUTOFF_V = 11.90;
+    // 1. FONT MAP HD44780 5x8 PIXELS PARA CADA CARACTERE
+    const FONT_5X8 = {
+      ' ': [0,0,0,0,0,0,0,0],
+      '0': [14,17,19,21,25,17,14,0],
+      '1': [4,12,4,4,4,4,14,0],
+      '2': [14,17,1,2,4,8,31,0],
+      '3': [31,2,4,2,1,17,14,0],
+      '4': [2,6,10,18,31,2,2,0],
+      '5': [31,16,30,1,1,17,14,0],
+      '6': [6,8,16,30,17,17,14,0],
+      '7': [31,1,2,4,8,8,8,0],
+      '8': [14,17,17,14,17,17,14,0],
+      '9': [14,17,17,15,1,2,12,0],
+      'A': [14,17,17,31,17,17,17,0],
+      'B': [30,17,17,30,17,17,30,0],
+      'C': [14,17,16,16,16,17,14,0],
+      'D': [28,18,17,17,17,18,28,0],
+      'E': [31,16,16,30,16,16,31,0],
+      'F': [31,16,16,30,16,16,16,0],
+      'G': [14,17,16,23,17,17,15,0],
+      'H': [17,17,17,31,17,17,17,0],
+      'I': [14,4,4,4,4,4,14,0],
+      'J': [7,2,2,2,2,18,12,0],
+      'K': [17,18,20,24,20,18,17,0],
+      'L': [16,16,16,16,16,16,31,0],
+      'M': [17,27,21,21,17,17,17,0],
+      'N': [17,25,21,19,17,17,17,0],
+      'O': [14,17,17,17,17,17,14,0],
+      'P': [30,17,17,30,16,16,16,0],
+      'Q': [14,17,17,17,21,18,13,0],
+      'R': [30,17,17,30,20,18,17,0],
+      'S': [15,16,16,14,1,1,30,0],
+      'T': [31,4,4,4,4,4,4,0],
+      'U': [17,17,17,17,17,17,14,0],
+      'V': [17,17,17,17,17,10,4,0],
+      'W': [17,17,17,21,21,27,17,0],
+      'X': [17,17,10,4,10,17,17,0],
+      'Y': [17,17,17,10,4,4,4,0],
+      'Z': [31,1,2,4,8,16,31,0],
+      ':': [0,12,12,0,12,12,0,0],
+      '.': [0,0,0,0,0,12,12,0],
+      '%': [25,26,2,4,8,19,19,0],
+      '-': [0,0,0,31,0,0,0,0],
+      '=': [0,0,31,0,31,0,0,0],
+      '>': [16,8,4,2,4,8,16,0],
+      '<': [1,2,4,8,4,2,1,0],
+      '/': [1,1,2,4,8,16,16,0],
+      '(': [2,4,8,8,8,4,2,0],
+      ')': [8,4,2,2,2,4,8,0],
+      '!': [4,4,4,4,4,0,4,0],
+      '?': [14,17,1,2,4,0,4,0]
+    };
+
+    // Parâmetros do Firmware
+    let SOIL_DRY_RAW = 800;
+    let SOIL_WET_RAW = 350;
+    let BATTERY_CUTOFF_V = 11.90;
+    let RELAY_ACTIVE_LOW = false;
 
     const DEBOUNCE_MS = 35;
     const LONG_PRESS_MS = 900;
@@ -1888,7 +1630,6 @@
     const intervalOptions = [1, 2, 3, 4, 6, 12];
     const valveOptions = [5, 10, 15, 20, 30, 45, 60, 90, 120, 180];
 
-    // Estado da Configuração (EEPROM)
     let config = {
       magic: EEPROM_MAGIC,
       humidityLimit: 45,
@@ -1910,41 +1651,58 @@
     let batteryVoltage = 12.4;
     let batteryReadingAvailable = true;
 
-    let valveOpen = false;
+    let relayEnergized = false; // Estado do Módulo Relé 5V
+    let valveOpen = false;       // Válvula Solenóide 12V
     let valveEndsAt = 0;
     let nextSoilReadAt = 0;
     let lastBatteryCheckAt = 0;
     let lastUiActivityAt = 0;
     let lastRenderAt = 0;
 
-    // Estado do Botão & Debounce
+    let lcdCurrentLine1 = 'HORTA AUTONOMA  ';
+    let lcdCurrentLine2 = 'Iniciando...    ';
+
+    // Botão Físico
     let buttonIsDown = false;
     let buttonPressedAt = 0;
     let longPressTriggered = false;
 
-    // Estado da Simulação Física
+    // Simulação Física
     let simMillis = 0;
-    let simSpeed = 1; // Multiplicador de velocidade
+    let simSpeed = 1;
     let lastWallClockTime = performance.now();
-    let simDay = 1;
     let totalWaterDeliveredLiters = 0.0;
-    let solarIrradianceW = 750; // W/m2
-    let batterySocAh = 7.65; // de 9.0 Ah nominais
+    let solarIrradianceW = 750;
+    let batterySocAh = 7.65;
     let soundEnabled = true;
 
-    // Web Audio Context para sintetizar sons mecânicos
-    let audioCtx = null;
+    // Configuração das 9 Prateleiras dos 3 Paletes
+    let shelfData = {
+      1: {
+        1: { plant: 'jiboia', flow: 2.0, connected: true, moist: 55 },
+        2: { plant: 'samambaia', flow: 2.0, connected: true, moist: 60 },
+        3: { plant: 'folhagem_roxa', flow: 2.0, connected: true, moist: 50 }
+      },
+      2: {
+        1: { plant: 'alface', flow: 1.0, connected: true, moist: 65 },
+        2: { plant: 'manjericao', flow: 1.0, connected: true, moist: 45 }, // Sonda A0
+        3: { plant: 'alecrim', flow: 1.0, connected: true, moist: 40 }
+      },
+      3: {
+        1: { plant: 'petunia', flow: 0.5, connected: true, moist: 45 },
+        2: { plant: 'onze_horas', flow: 0.5, connected: true, moist: 40 },
+        3: { plant: 'suculenta', flow: 0.5, connected: true, moist: 25 }
+      }
+    };
 
+    // Áudio Sintetizado (Web Audio API)
+    let audioCtx = null;
     function initAudio() {
       if (!audioCtx) {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (AudioContext) {
-          audioCtx = new AudioContext();
-        }
+        if (AudioContext) audioCtx = new AudioContext();
       }
-      if (audioCtx && audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
     }
 
     function playClickSound(freq = 800, dur = 0.03) {
@@ -1956,16 +1714,14 @@
         const gain = audioCtx.createGain();
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + dur);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + dur);
       } catch (e) {}
     }
 
-    function playRelaySound(isOpen) {
+    function playRelayMechanicalSound(isEngaging) {
       if (!soundEnabled) return;
       initAudio();
       if (!audioCtx) return;
@@ -1973,13 +1729,11 @@
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.type = 'square';
-        osc.frequency.setValueAtTime(isOpen ? 140 : 220, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.08);
+        osc.frequency.setValueAtTime(isEngaging ? 260 : 160, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.22, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.06);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.06);
       } catch (e) {}
     }
 
@@ -1989,50 +1743,68 @@
       if (soundEnabled) {
         btn.classList.add('active-sound');
         btn.innerText = '🔊 Som: ON';
-        playClickSound(600, 0.05);
+        playClickSound(600, 0.04);
       } else {
         btn.classList.remove('active-sound');
         btn.innerText = '🔇 Mudo';
       }
     }
 
-    // EEPROM Simulação
-    function saveConfig() {
-      config.magic = EEPROM_MAGIC;
-      try {
-        localStorage.setItem('horta_uno_config', JSON.stringify(config));
-      } catch(e) {}
-      logSerial('Configuracao salva na EEPROM.');
-    }
+    // 2. RENDERIZADOR CANVAS DA MATRIZ DE PIXELS 5X8 DO LCD 16X2
+    function drawLcdCanvas() {
+      const canvas = document.getElementById('lcdCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
 
-    function loadConfig() {
-      try {
-        const saved = localStorage.getItem('horta_uno_config');
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (parsed.magic === EEPROM_MAGIC &&
-              humidityOptions.includes(parsed.humidityLimit) &&
-              intervalOptions.includes(parsed.intervalHours) &&
-              valveOptions.includes(parsed.valveSeconds)) {
-            config = parsed;
-            return;
+      const cols = 16;
+      const rows = 2;
+      const dotW = 4;
+      const dotH = 4;
+      const dotGap = 1;
+      const charW = 5 * dotW + 4 * dotGap; // 24px
+      const charH = 8 * dotH + 7 * dotGap; // 39px
+      const charGapX = 7;
+      const charGapY = 12;
+      const padX = 14;
+      const padY = 12;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const isBacklight = displayAwake;
+      const onColor = isBacklight ? '#ffffff' : '#0a1d2e';
+      const offColor = isBacklight ? 'rgba(0, 48, 86, 0.45)' : 'rgba(5, 18, 30, 0.25)';
+
+      const lines = [lcdCurrentLine1.padEnd(16, ' '), lcdCurrentLine2.padEnd(16, ' ')];
+
+      for (let r = 0; r < rows; r++) {
+        const lineText = lines[r];
+        for (let c = 0; c < cols; c++) {
+          const char = lineText[c] ? lineText[c].toUpperCase() : ' ';
+          const bitmap = FONT_5X8[char] || FONT_5X8[' '];
+
+          const startX = padX + c * (charW + charGapX);
+          const startY = padY + r * (charH + charGapY);
+
+          for (let rowIdx = 0; rowIdx < 8; rowIdx++) {
+            const byteVal = bitmap[rowIdx] || 0;
+            for (let colIdx = 0; colIdx < 5; colIdx++) {
+              const bit = (byteVal >> (4 - colIdx)) & 1;
+              const x = startX + colIdx * (dotW + dotGap);
+              const y = startY + rowIdx * (dotH + dotGap);
+
+              ctx.fillStyle = bit ? onColor : offColor;
+              ctx.fillRect(x, y, dotW, dotH);
+            }
           }
         }
-      } catch (e) {}
-      config.magic = EEPROM_MAGIC;
-      config.humidityLimit = 45;
-      config.intervalHours = 1;
-      config.valveSeconds = 30;
-      saveConfig();
+      }
     }
 
-    // Conversões e Leituras de Sensores
+    // Conversões e Calibrações
     function convertSoilToPercent(raw) {
       if (SOIL_DRY_RAW === SOIL_WET_RAW) return 0;
       let val = Math.round(((raw - SOIL_DRY_RAW) / (SOIL_WET_RAW - SOIL_DRY_RAW)) * 100);
-      if (val < 0) val = 0;
-      if (val > 100) val = 100;
-      return val;
+      return Math.max(0, Math.min(100, val));
     }
 
     function convertPercentToRaw(pct) {
@@ -2041,7 +1813,15 @@
     }
 
     function readIntervalMs() {
-      return config.intervalHours * 60 * 60 * 1000;
+      return config.intervalHours * 3600000;
+    }
+
+    // Ações do Relé e Válvula
+    function setRelay(state) {
+      relayEnergized = state;
+      valveOpen = state; // Contatos NO fecham e acionam a solenoide 12V
+      playRelayMechanicalSound(state);
+      updateRelayUi();
     }
 
     function startWatering() {
@@ -2053,23 +1833,20 @@
         return;
       }
 
-      valveOpen = true;
+      setRelay(true);
       valveEndsAt = simMillis + (config.valveSeconds * 1000);
-      playRelaySound(true);
-      logSerial('Valvula ABERTA.', 'success');
+      logSerial('Valvula ABERTA via Rele 5V.', 'success');
       updateUiElements();
     }
 
     function stopWatering() {
-      valveOpen = false;
+      setRelay(false);
       nextSoilReadAt = simMillis + readIntervalMs();
-      playRelaySound(false);
       logSerial('Valvula FECHADA. Proxima leitura agendada.');
       updateUiElements();
     }
 
     function takeSoilReading() {
-      // Verifica falha
       soilSensorFault = (soilRaw <= 5 || soilRaw >= 1018);
       soilPercent = convertSoilToPercent(soilRaw);
       soilReadingAvailable = true;
@@ -2088,22 +1865,21 @@
 
     // Interface do LCD
     function setBacklight(on) {
-      const screen = document.getElementById('lcdScreen');
+      const wrap = document.getElementById('lcdCanvasWrap');
       const badge = document.getElementById('lcdBacklightBadge');
       const led = document.getElementById('ledD10');
       if (on) {
-        screen.classList.remove('backlight-off');
-        screen.classList.add('backlight-on');
+        wrap.className = 'lcd-canvas-wrap backlight-on';
         badge.className = 'lcd-badge badge-on';
         badge.innerText = 'BACKLIGHT ON';
         led.classList.add('active');
       } else {
-        screen.classList.remove('backlight-on');
-        screen.classList.add('backlight-off');
+        wrap.className = 'lcd-canvas-wrap backlight-off';
         badge.className = 'lcd-badge badge-off';
         badge.innerText = 'BACKLIGHT OFF (30s)';
         led.classList.remove('active');
       }
+      drawLcdCanvas();
     }
 
     function wakeDisplay() {
@@ -2115,28 +1891,15 @@
 
     function sleepDisplay() {
       if (editMode) return;
-      setBacklight(false);
       displayAwake = false;
-      document.getElementById('lcdLine1').innerText = ''.padEnd(16, ' ');
-      document.getElementById('lcdLine2').innerText = ''.padEnd(16, ' ');
+      setBacklight(false);
+      lcdCurrentLine1 = '                ';
+      lcdCurrentLine2 = '                ';
+      drawLcdCanvas();
     }
 
     function currentPageIsEditable() {
       return (currentPage === 2 || currentPage === 3 || currentPage === 4);
-    }
-
-    function nextByteOption(current, options) {
-      for (let i = 0; i < options.length; i++) {
-        if (options[i] === current) return options[(i + 1) % options.length];
-      }
-      return options[0];
-    }
-
-    function nextValveOption(current) {
-      for (let i = 0; i < valveOptions.length; i++) {
-        if (valveOptions[i] === current) return valveOptions[(i + 1) % valveOptions.length];
-      }
-      return valveOptions[0];
     }
 
     function handleButtonGesture(duration) {
@@ -2153,11 +1916,11 @@
           editMode = false;
         } else {
           if (currentPage === 2) {
-            config.humidityLimit = nextByteOption(config.humidityLimit, humidityOptions);
+            config.humidityLimit = nextOption(config.humidityLimit, humidityOptions);
           } else if (currentPage === 3) {
-            config.intervalHours = nextByteOption(config.intervalHours, intervalOptions);
+            config.intervalHours = nextOption(config.intervalHours, intervalOptions);
           } else if (currentPage === 4) {
-            config.valveSeconds = nextValveOption(config.valveSeconds);
+            config.valveSeconds = nextOption(config.valveSeconds, valveOptions);
           }
         }
         lastRenderAt = 0;
@@ -2165,9 +1928,7 @@
       }
 
       if (duration >= LONG_PRESS_MS) {
-        if (currentPageIsEditable()) {
-          editMode = true;
-        }
+        if (currentPageIsEditable()) editMode = true;
       } else {
         currentPage = (currentPage + 1) % PAGE_COUNT;
       }
@@ -2175,79 +1936,83 @@
       lastRenderAt = 0;
     }
 
-    // Renderização das Telas LCD fiéis ao Arduino
+    function nextOption(current, arr) {
+      const idx = arr.indexOf(current);
+      return idx >= 0 ? arr[(idx + 1) % arr.length] : arr[0];
+    }
+
+    function saveConfig() {
+      config.magic = EEPROM_MAGIC;
+      logSerial('Configuracao salva na EEPROM.');
+    }
+
     function renderScreen() {
       if (!displayAwake) return;
 
-      let line1 = '';
-      let line2 = '';
+      let l1 = '';
+      let l2 = '';
 
       if (editMode) {
         if (currentPage === 2) {
-          line1 = 'EDITAR UMID.MIN';
-          line2 = `VALOR: ${config.humidityLimit}%`;
+          l1 = 'EDITAR UMID.MIN';
+          l2 = `VALOR: ${config.humidityLimit}%`;
         } else if (currentPage === 3) {
-          line1 = 'EDITAR INTERVALO';
-          line2 = `VALOR: ${String(config.intervalHours).padStart(2, '0')} H`;
+          l1 = 'EDITAR INTERVALO';
+          l2 = `VALOR: ${String(config.intervalHours).padStart(2,'0')} H`;
         } else if (currentPage === 4) {
-          line1 = 'EDITAR VALVULA';
-          line2 = `TEMPO: ${config.valveSeconds} SEG`;
+          l1 = 'EDITAR VALVULA';
+          l2 = `TEMPO: ${config.valveSeconds} SEG`;
         }
       } else {
         switch (currentPage) {
           case 0:
             if (soilSensorFault) {
-              line1 = 'ERRO NO SENSOR';
+              l1 = 'ERRO NO SENSOR';
             } else if (soilReadingAvailable) {
               const statusStr = soilPercent <= config.humidityLimit ? 'SECO' : 'OK';
-              line1 = `SOLO: ${String(soilPercent).padStart(3, ' ')}% ${statusStr}`;
+              l1 = `SOLO: ${String(soilPercent).padStart(3,' ')}% ${statusStr}`;
             } else {
-              line1 = 'SOLO: AGUARDE';
+              l1 = 'SOLO: AGUARDE';
             }
-            line2 = `VALVULA: ${valveOpen ? 'ABERTA' : 'FECHADA'}`;
+            l2 = `VALVULA: ${valveOpen ? 'ABERTA' : 'FECHADA'}`;
             break;
-
           case 1:
-            line1 = 'PROX. LEITURA';
+            l1 = 'PROX. LEITURA';
             if (valveOpen) {
-              line2 = 'IRRIGANDO AGORA';
+              l2 = 'IRRIGANDO AGORA';
             } else {
-              let remaining = Math.max(0, nextSoilReadAt - simMillis);
-              let totalMins = Math.floor(remaining / 60000);
+              let rem = Math.max(0, nextSoilReadAt - simMillis);
+              let totalMins = Math.floor(rem / 60000);
               let hh = Math.floor(totalMins / 60);
               let mm = totalMins % 60;
-              line2 = `EM ${String(hh).padStart(2, '0')}H ${String(mm).padStart(2, '0')}M`;
+              l2 = `EM ${String(hh).padStart(2,'0')}H ${String(mm).padStart(2,'0')}M`;
             }
             break;
-
           case 2:
-            line1 = 'UMID. MIN. LIGAR';
-            line2 = `ABAIXO DE: ${config.humidityLimit}%`;
+            l1 = 'UMID. MIN. LIGAR';
+            l2 = `ABAIXO DE: ${config.humidityLimit}%`;
             break;
-
           case 3:
-            line1 = 'INTERVALO LEIT.';
-            line2 = `LEITURA: ${String(config.intervalHours).padStart(2, '0')} H`;
+            l1 = 'INTERVALO LEIT.';
+            l2 = `LEITURA: ${String(config.intervalHours).padStart(2,'0')} H`;
             break;
-
           case 4:
-            line1 = 'MAX. IRRIGACAO';
-            line2 = `TEMPO: ${config.valveSeconds} SEG`;
+            l1 = 'MAX. IRRIGACAO';
+            l2 = `TEMPO: ${config.valveSeconds} SEG`;
             break;
-
           case 5:
             const tenths = Math.round(batteryVoltage * 10);
             const vStr = (tenths / 10).toFixed(1);
-            line1 = `BATERIA: ${vStr.padStart(4, ' ')}V`;
-            line2 = batteryVoltage < BATTERY_CUTOFF_V ? 'BATERIA BAIXA' : 'ALIMENTACAO OK';
+            l1 = `BATERIA: ${vStr.padStart(4,' ')}V`;
+            l2 = batteryVoltage < BATTERY_CUTOFF_V ? 'BATERIA BAIXA' : 'ALIMENTACAO OK';
             break;
         }
       }
 
-      document.getElementById('lcdLine1').innerText = line1.padEnd(16, ' ').substring(0, 16);
-      document.getElementById('lcdLine2').innerText = line2.padEnd(16, ' ').substring(0, 16);
+      lcdCurrentLine1 = l1.padEnd(16, ' ').substring(0, 16);
+      lcdCurrentLine2 = l2.padEnd(16, ' ').substring(0, 16);
+      drawLcdCanvas();
 
-      // Metadados da tela
       document.getElementById('lblPageNum').innerText = `${currentPage}/5`;
       const pageNames = ['(Status)', '(Próx. Leitura)', '(Umid. Mínima)', '(Intervalo)', '(Tempo Válvula)', '(Bateria)'];
       document.getElementById('lblPageName').innerText = pageNames[currentPage];
@@ -2256,17 +2021,15 @@
       if (editMode) {
         editBadge.style.display = 'inline-block';
         editBadge.className = 'lcd-badge badge-edit';
-        editBadge.innerText = 'MODO EDIÇÃO';
       } else {
         editBadge.style.display = 'none';
       }
 
-      // Timeout restante
-      const remainingTimeout = Math.max(0, Math.ceil((LCD_TIMEOUT_MS - (simMillis - lastUiActivityAt)) / 1000));
-      document.getElementById('lblLcdTimer').innerText = `${remainingTimeout}s`;
+      const remTimeout = Math.max(0, Math.ceil((LCD_TIMEOUT_MS - (simMillis - lastUiActivityAt)) / 1000));
+      document.getElementById('lblLcdTimer').innerText = `${remTimeout}s`;
     }
 
-    // Interações com o Botão (Clique e Hold com barra circular SVG)
+    // Botão Físico
     function btnDown(e) {
       if (e) e.preventDefault();
       initAudio();
@@ -2285,12 +2048,11 @@
       document.getElementById('mainButton').classList.remove('pressed');
       document.getElementById('pinD2Val').innerText = 'HIGH';
 
-      const duration = simMillis - buttonPressedAt;
-      handleButtonGesture(duration);
+      const dur = simMillis - buttonPressedAt;
+      handleButtonGesture(dur);
 
-      // Reseta anel SVG
       const ring = document.getElementById('btnProgressRing');
-      ring.style.strokeDashoffset = '301.6';
+      ring.style.strokeDashoffset = '276.4';
       ring.classList.remove('ready-long');
       document.getElementById('btnHoldLabel').innerHTML = 'Pressione e segure • Limiar: <b>900 ms</b>';
     }
@@ -2319,7 +2081,6 @@
       serial.appendChild(div);
       serial.scrollTop = serial.scrollHeight;
 
-      // Pisca LED TX
       const led13 = document.getElementById('ledD13');
       led13.classList.add('active');
       setTimeout(() => led13.classList.remove('active'), 80);
@@ -2329,106 +2090,101 @@
       document.getElementById('serialLog').innerHTML = '';
     }
 
-    function downloadSerialLog() {
-      const text = Array.from(document.querySelectorAll('.serial-log-line')).map(el => el.innerText).join('\n');
-      const blob = new Blob([text], { type: 'text/plain' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `serial_horta_log_${Date.now()}.txt`;
-      a.click();
-    }
-
     // FÍSICA E ATUALIZAÇÃO DO SISTEMA
     function updatePhysics(dtSec) {
-      // 1. Evaporação natural do solo dependendo da irradiação
-      const evapRatePerSec = (0.002 + (solarIrradianceW / 1000) * 0.006) * (simSpeed > 0 ? 1 : 0);
-      let targetMoist = soilPercent - (evapRatePerSec * dtSec);
-      if (targetMoist < 0) targetMoist = 0;
+      // Evaporação do solo
+      const evapRate = (0.002 + (solarIrradianceW / 1000) * 0.006);
 
-      // 2. Se a válvula estiver aberta: água é injetada
-      if (valveOpen) {
-        // Vazão média do sistema: 3 paletes com 3 prateleiras cada:
-        // Palete 1: 3 x 2.0 L/h = 6.0 L/h
-        // Palete 2: 3 x 1.0 L/h = 3.0 L/h
-        // Palete 3: 3 x 0.5 L/h = 1.5 L/h
-        // Vazão total = 10.5 L/h
-        const totalFlowLh = 10.5;
-        const waterAddedL = (totalFlowLh / 3600) * dtSec;
-        totalWaterDeliveredLiters += waterAddedL;
-
-        // Umidade no vaso de referência sobe rapidamente
-        targetMoist += 1.8 * dtSec;
-        if (targetMoist > 100) targetMoist = 100;
+      // Calcula vazão total real das 9 prateleiras
+      let systemTotalFlowLh = 0;
+      for (let p = 1; p <= 3; p++) {
+        for (let s = 1; s <= 3; s++) {
+          const item = shelfData[p][s];
+          if (item.connected) {
+            systemTotalFlowLh += item.flow;
+          }
+        }
       }
 
-      soilPercent = Math.round(targetMoist);
+      // Atualiza cada prateleira individualmente
+      for (let p = 1; p <= 3; p++) {
+        for (let s = 1; s <= 3; s++) {
+          const item = shelfData[p][s];
+          item.moist = Math.max(0, item.moist - evapRate * dtSec);
+          if (valveOpen && item.connected) {
+            item.moist = Math.min(100, item.moist + (item.flow * 0.9 * dtSec));
+          }
+        }
+      }
+
+      // O vaso de referência é P2S2 (Palete 2, Prateleira 2)
+      soilPercent = Math.round(shelfData[2][2].moist);
       soilRaw = convertPercentToRaw(soilPercent);
 
-      // 3. Sistema Fotovoltaico & Bateria
-      // Potência do painel 20Wp: P = 20 * (Irrad / 1000)
+      // Água entregue
+      if (valveOpen) {
+        totalWaterDeliveredLiters += (systemTotalFlowLh / 3600.0) * dtSec;
+      }
+
+      // Sistema Elétrico (Painel 20Wp + Bateria 12V 9Ah)
       const solarWatts = 20.0 * (solarIrradianceW / 1000.0);
       const solarCurrentA = solarWatts > 0 ? (solarWatts / Math.max(12.0, batteryVoltage)) : 0;
 
-      // Consumo de cargas
-      // Arduino base + buck: ~0.45W (~35mA)
-      // LCD backlight ligado: +0.25W (+20mA)
-      // Válvula solenóide 12V aberta: 18.0W (1.5A = 1500mA)
+      // Consumos: Arduino + Buck ~35mA; LCD ~20mA; Relé 5V ~70mA quando acionado; Solenóide 12V 1.5A
       let loadCurrentA = 0.035;
       if (displayAwake) loadCurrentA += 0.020;
-      if (valveOpen) loadCurrentA += 1.500;
+      if (relayEnergized) loadCurrentA += 0.070; // Bobina do relé 5V
+      if (valveOpen) loadCurrentA += 1.500;      // Bobina da válvula 12V
 
-      // Balanço líquido de corrente para a bateria
       const netCurrentA = solarCurrentA - loadCurrentA;
-      // Atualiza Ah da bateria (9.0 Ah nominal)
-      batterySocAh += (netCurrentA * (dtSec / 3600.0));
-      if (batterySocAh > 9.0) batterySocAh = 9.0;
-      if (batterySocAh < 0.5) batterySocAh = 0.5;
+      batterySocAh = Math.max(0.5, Math.min(9.0, batterySocAh + (netCurrentA * (dtSec / 3600.0))));
 
-      // Tensão da bateria em função do SoC e carga
       const socPct = batterySocAh / 9.0;
-      let baseV = 11.5 + (socPct * 1.3); // 11.5V (vazia) a 12.8V (cheia em repouso)
-      if (solarCurrentA > 0.3) {
-        baseV = Math.min(14.4, baseV + 0.6); // Em absorção PWM até 14.4V
-      }
-      if (valveOpen) {
-        baseV -= 0.35; // Queda de tensão sob carga pesada de 1.5A
-      }
+      let baseV = 11.5 + (socPct * 1.3);
+      if (solarCurrentA > 0.3) baseV = Math.min(14.4, baseV + 0.6);
+      if (valveOpen) baseV -= 0.35;
       batteryVoltage = Math.round(baseV * 10) / 10;
     }
 
-    // Ciclo de Automação do Firmware
-    function updateFirmwareAutomation() {
-      // 1. Checagem periódica da bateria (a cada 10s)
-      if (!batteryReadingAvailable || (simMillis - lastBatteryCheckAt) >= BATTERY_CHECK_MS) {
-        batteryReadingAvailable = true;
-        lastBatteryCheckAt = simMillis;
-      }
+    function updateRelayUi() {
+      const badge = document.getElementById('lblRelayStatusBadge');
+      const inVal = document.getElementById('lblRelayInVal');
+      const contact = document.getElementById('lblRelayContact');
+      const loadVal = document.getElementById('lblRelayLoadVal');
+      const ledD9 = document.getElementById('ledD9');
+      const schemRelay = document.getElementById('schemRelayLabel');
+      const schemSol = document.getElementById('schemSolState');
+      const wireRelaySol = document.getElementById('wireRelaySol');
 
-      // 2. Controle de tempo da válvula
-      if (valveOpen && (simMillis - valveEndsAt) >= 0) {
-        stopWatering();
-      }
-
-      // 3. Leitura do solo programada
-      if (!valveOpen && (simMillis - nextSoilReadAt) >= 0) {
-        takeSoilReading();
-      }
-
-      // 4. Inatividade do LCD
-      if (displayAwake && !editMode && (simMillis - lastUiActivityAt) >= LCD_TIMEOUT_MS) {
-        sleepDisplay();
-      }
-
-      // 5. Renderização periódica a cada 400ms
-      if (displayAwake && (simMillis - lastRenderAt) >= 400) {
-        renderScreen();
-        lastRenderAt = simMillis;
+      if (relayEnergized) {
+        badge.className = 'lcd-badge badge-on';
+        badge.innerText = 'LIGADO (FECHADO)';
+        inVal.innerText = 'HIGH (5V)';
+        inVal.style.color = '#34d399';
+        contact.innerText = 'COM ➔ NO (Conduzindo)';
+        contact.style.color = '#22c55e';
+        loadVal.innerText = '18.0 W (1.5 A)';
+        ledD9.classList.add('active');
+        if (schemRelay) schemRelay.style.fill = '#22c55e';
+        if (schemSol) { schemSol.innerText = 'ABERTA'; schemSol.style.fill = '#22c55e'; }
+        if (wireRelaySol) wireRelaySol.classList.add('wire-active');
+      } else {
+        badge.className = 'lcd-badge badge-off';
+        badge.innerText = 'DESLIGADO';
+        inVal.innerText = 'LOW (0V)';
+        inVal.style.color = '#38bdf8';
+        contact.innerText = 'COM ➔ NC (Aberto)';
+        contact.style.color = '#ef4444';
+        loadVal.innerText = '0 W (0 A)';
+        ledD9.classList.remove('active');
+        if (schemRelay) schemRelay.style.fill = '#fff';
+        if (schemSol) { schemSol.innerText = 'FECHADA'; schemSol.style.fill = '#eab308'; }
+        if (wireRelaySol) wireRelaySol.classList.remove('wire-active');
       }
     }
 
-    // Atualização da Interface Visual
     function updateUiElements() {
-      // Relógio Simulado
+      // Relógio
       const totalSec = Math.floor(simMillis / 1000);
       const s = totalSec % 60;
       const m = Math.floor(totalSec / 60) % 60;
@@ -2438,107 +2194,69 @@
         `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
       document.getElementById('simDayCount').innerText = `Dia ${day}`;
 
-      // Válvula e solenóide visual
-      const valveBadge = document.getElementById('valveStatusBadge');
-      const lblValve = document.getElementById('lblValveState');
-      const mosfetState = document.getElementById('lblMosfetState');
+      // Status Válvula / Solenóide
       const scene = document.getElementById('gardenScene');
-      const ledD9 = document.getElementById('ledD9');
+      const lblValve = document.getElementById('lblValveState');
+      const solLed = document.getElementById('solenoidLed');
+
+      let currentFlowLh = 0;
+      for (let p = 1; p <= 3; p++) {
+        for (let s = 1; s <= 3; s++) {
+          if (shelfData[p][s].connected) currentFlowLh += shelfData[p][s].flow;
+        }
+      }
 
       if (valveOpen) {
-        valveBadge.className = 'valve-indicator valve-open';
-        lblValve.innerText = 'VÁLVULA 12V: ABERTA';
-        lblValve.style.color = '#34d399';
-        mosfetState.innerText = 'MOSFET: CONDUZINDO (1.5A)';
-        mosfetState.style.color = '#34d399';
         scene.classList.add('valve-open');
-        ledD9.classList.add('active');
-        document.getElementById('lblHydraulicFlow').innerText = '10.50 L/h (Irrigando)';
+        lblValve.innerText = 'VÁLVULA 12V: ABERTA (IRRIGANDO)';
+        lblValve.style.color = '#34d399';
+        solLed.className = 'pin-led led-green active';
+        document.getElementById('lblHydraulicFlow').innerText = `${currentFlowLh.toFixed(1)} L/h (Irrigando)`;
       } else {
-        valveBadge.className = 'valve-indicator';
+        scene.classList.remove('valve-open');
         lblValve.innerText = 'VÁLVULA 12V: FECHADA';
         lblValve.style.color = 'var(--text-main)';
-        mosfetState.innerText = 'MOSFET: BLOQUEADO (0A)';
-        mosfetState.style.color = '#f87171';
-        scene.classList.remove('valve-open');
-        ledD9.classList.remove('active');
+        solLed.className = 'pin-led led-red';
         document.getElementById('lblHydraulicFlow').innerText = '0.00 L/h (Estático)';
       }
 
-      // Sensores Uno
+      // Sensores
       document.getElementById('pinA0Val').innerText = `${soilRaw} (${soilPercent}%)`;
-      const vA1 = (batteryVoltage * (33.0 / 133.0)).toFixed(2);
-      const adcA1 = Math.round((vA1 / 5.0) * 1023);
-      document.getElementById('pinA1Val').innerText = `${vA1}V (${batteryVoltage.toFixed(1)}V)`;
-      document.getElementById('lblA1Volts').innerText = `${vA1} V`;
-      document.getElementById('lblA1Adc').innerText = adcA1;
-
-      // Horta dados
+      document.getElementById('lblKitAoVal').innerText = `${soilRaw} (${soilPercent}%)`;
+      document.getElementById('lblKitDoVal').innerText = soilPercent <= config.humidityLimit ? 'HIGH (Seco)' : 'LOW (Úmido)';
       document.getElementById('lblGardenMoisture').innerText = `${soilPercent}% (RAW: ${soilRaw})`;
       document.getElementById('lblTotalWater').innerText = `${totalWaterDeliveredLiters.toFixed(2)} L`;
 
-      // Atualiza opacidade de umidade dos solos nos paletes
-      const opacity = 0.2 + (soilPercent / 100) * 0.75;
-      document.querySelectorAll('.soil-moisture-indicator').forEach(el => {
-        el.style.opacity = opacity;
-      });
+      const vA1 = (batteryVoltage * (33.0 / 133.0)).toFixed(2);
+      document.getElementById('pinA1Val').innerText = `${vA1}V (${batteryVoltage.toFixed(1)}V)`;
 
-      // Painel Solar e Sol
+      // Atualiza opacidade de umidade dos solos nos paletes
+      for (let p = 1; p <= 3; p++) {
+        for (let s = 1; s <= 3; s++) {
+          const el = document.getElementById(`soilP${p}S${s}`);
+          if (el) {
+            el.style.opacity = 0.2 + (shelfData[p][s].moist / 100) * 0.75;
+          }
+        }
+      }
+      const refEl = document.getElementById('soilRef');
+      if (refEl) refEl.style.opacity = 0.2 + (soilPercent / 100) * 0.75;
+
+      // Solar & Bateria
       const solarW = (20.0 * (solarIrradianceW / 1000.0)).toFixed(1);
       document.getElementById('lblSolarPower').innerText = `${solarW} W`;
-      document.getElementById('sliderSolar').value = solarIrradianceW;
-      document.getElementById('sliderSunBottom').value = solarIrradianceW;
-      document.getElementById('sliderSunVal').innerText = `${solarIrradianceW} W/m²`;
-
-      const sunOrb = document.getElementById('sunOrb');
-      const sunRatio = solarIrradianceW / 1000;
-      sunOrb.style.opacity = sunRatio;
-      sunOrb.style.transform = `scale(${0.5 + sunRatio * 0.7})`;
-      document.getElementById('lblSunStatus').innerText = 
-        solarIrradianceW === 0 ? '🌙 Noite (0 W/m²)' :
-        solarIrradianceW < 400 ? `⛅ Parcial (${solarIrradianceW} W/m²)` : `☀️ Pleno Sol (${solarIrradianceW} W/m²)`;
-
-      // Céu dia/noite
-      const nightVeil = document.getElementById('dayNightVeil');
-      nightVeil.style.background = `rgba(0, 5, 20, ${0.75 * (1 - sunRatio)})`;
-
-      // Controlador SUN21
-      const ledPv = document.getElementById('ledSunPv');
-      const sun21Mode = document.getElementById('sun21Mode');
-      const sun21Volt = document.getElementById('sun21Volt');
-      sun21Volt.innerText = `${batteryVoltage.toFixed(1)} V`;
-
-      if (solarIrradianceW > 100) {
-        ledPv.classList.add('active');
-        if (batteryVoltage >= 14.3) {
-          sun21Mode.innerText = 'MODO: ABSORÇÃO BOOST';
-        } else if (batteryVoltage >= 13.7) {
-          sun21Mode.innerText = 'MODO: FLUTUAÇÃO';
-        } else {
-          sun21Mode.innerText = 'MODO: CARGA BULK';
-        }
-      } else {
-        ledPv.classList.remove('active');
-        sun21Mode.innerText = 'MODO: STANDBY NOTURNO';
-      }
-
-      // Bateria 12V 9Ah
+      document.getElementById('sun21Volt').innerText = `${batteryVoltage.toFixed(1)} V`;
       const batPct = Math.round((batterySocAh / 9.0) * 100);
       document.getElementById('lblBatPercent').innerText = `${batPct}% (${batteryVoltage.toFixed(1)}V)`;
       document.getElementById('batFill').style.width = `${batPct}%`;
-      const netMa = Math.round(((solarW / batteryVoltage) - (valveOpen ? 1.535 : 0.055)) * 1000);
+
+      const netMa = Math.round(((solarW / batteryVoltage) - (valveOpen ? 1.57 : 0.055)) * 1000);
       const batCurrentEl = document.getElementById('lblBatCurrent');
       batCurrentEl.innerText = `${netMa >= 0 ? '+' : ''}${netMa} mA`;
       batCurrentEl.style.color = netMa >= 0 ? '#34d399' : (valveOpen ? '#f87171' : '#38bdf8');
-
-      // Sliders livres
-      document.getElementById('sliderMoisture').value = soilPercent;
-      document.getElementById('sliderMoistVal').innerText = `${soilPercent}% (RAW: ${soilRaw})`;
-      document.getElementById('sliderBattery').value = Math.round(batteryVoltage * 10);
-      document.getElementById('sliderBatVal').innerText = `${batteryVoltage.toFixed(1)} V`;
     }
 
-    // Loop Principal de Animação
+    // Loop Principal
     function loop(now) {
       const dtReal = (now - lastWallClockTime) / 1000;
       lastWallClockTime = now;
@@ -2547,28 +2265,50 @@
         const dtSimSec = dtReal * simSpeed;
         simMillis += dtSimSec * 1000;
 
-        // Atualiza física
         updatePhysics(dtSimSec);
 
-        // Atualiza automação
-        updateFirmwareAutomation();
+        // Checagem bateria periódica
+        if (!batteryReadingAvailable || (simMillis - lastBatteryCheckAt) >= BATTERY_CHECK_MS) {
+          batteryReadingAvailable = true;
+          lastBatteryCheckAt = simMillis;
+        }
+
+        // Fim de irrigação
+        if (valveOpen && (simMillis - valveEndsAt) >= 0) {
+          stopWatering();
+        }
+
+        // Leitura de solo
+        if (!valveOpen && (simMillis - nextSoilReadAt) >= 0) {
+          takeSoilReading();
+        }
+
+        // Inatividade LCD
+        if (displayAwake && !editMode && (simMillis - lastUiActivityAt) >= LCD_TIMEOUT_MS) {
+          sleepDisplay();
+        }
+
+        // Renderização LCD a cada 400ms
+        if (displayAwake && (simMillis - lastRenderAt) >= 400) {
+          renderScreen();
+          lastRenderAt = simMillis;
+        }
       }
 
-      // Feedback visual do anel de pressão do botão
+      // Anel do botão
       if (buttonIsDown) {
-        const duration = simMillis - buttonPressedAt;
-        const progress = Math.min(1.0, duration / LONG_PRESS_MS);
+        const dur = simMillis - buttonPressedAt;
+        const progress = Math.min(1.0, dur / LONG_PRESS_MS);
         const ring = document.getElementById('btnProgressRing');
-        const offset = 301.6 * (1.0 - progress);
-        ring.style.strokeDashoffset = offset.toFixed(1);
+        ring.style.strokeDashoffset = (276.4 * (1.0 - progress)).toFixed(1);
 
-        if (duration >= LONG_PRESS_MS && !longPressTriggered) {
+        if (dur >= LONG_PRESS_MS && !longPressTriggered) {
           longPressTriggered = true;
           ring.classList.add('ready-long');
           document.getElementById('btnHoldLabel').innerHTML = '<b style="color:var(--solar)">PRESSÃO LONGA PRONTA! (Solte para salvar/editar)</b>';
           playClickSound(1200, 0.06);
         } else if (!longPressTriggered) {
-          document.getElementById('btnHoldLabel').innerHTML = `Segurando: <b>${Math.round(duration)} ms</b> / 900 ms`;
+          document.getElementById('btnHoldLabel').innerHTML = `Segurando: <b>${Math.round(dur)} ms</b> / 900 ms`;
         }
       }
 
@@ -2576,22 +2316,15 @@
       requestAnimationFrame(loop);
     }
 
-    // Controles de Velocidade
     function setSpeed(spd) {
       simSpeed = spd;
       document.querySelectorAll('.btn-speed').forEach(b => b.classList.remove('active'));
-      const id = `spd${spd}`;
-      const btn = document.getElementById(id);
+      const btn = document.getElementById(`spd${spd}`);
       if (btn) btn.classList.add('active');
     }
 
     function fastForwardToReading() {
-      if (valveOpen) {
-        simMillis = valveEndsAt + 10;
-      } else {
-        simMillis = nextSoilReadAt + 10;
-      }
-      updateFirmwareAutomation();
+      simMillis = (valveOpen ? valveEndsAt : nextSoilReadAt) + 10;
       updateUiElements();
       renderScreen();
     }
@@ -2601,11 +2334,10 @@
       currentPage = 0;
       editMode = false;
       displayAwake = true;
-      valveOpen = false;
       totalWaterDeliveredLiters = 0;
+      setRelay(false);
       clearSerial();
       logSerial('--- REINICIANDO ARDUINO UNO R3 ---');
-      loadConfig();
       setBacklight(true);
       wakeDisplay();
       takeSoilReading();
@@ -2613,25 +2345,27 @@
       lastRenderAt = 0;
     }
 
-    // Ações dos Cenários de Teste
+    // Cenários de Teste Rápidos
     function applyScenario(sc) {
       wakeDisplay();
       switch (sc) {
         case 'dry_soil':
           soilRaw = 755;
           soilPercent = convertSoilToPercent(soilRaw);
+          shelfData[2][2].moist = 10;
           logSerial('[CENARIO] Solo Seco aplicado (10%). Forcando leitura...', 'warn');
           takeSoilReading();
           break;
         case 'wet_soil':
           soilRaw = 462;
           soilPercent = convertSoilToPercent(soilRaw);
+          shelfData[2][2].moist = 75;
           logSerial('[CENARIO] Solo Úmido aplicado (75%).', 'success');
           takeSoilReading();
           break;
         case 'sensor_fault_open':
           soilRaw = 1023;
-          logSerial('[CENARIO] Cabo do sensor desconectado (RAW 1023).', 'error');
+          logSerial('[CENARIO] Cabo analógico desconectado (RAW 1023).', 'error');
           takeSoilReading();
           break;
         case 'sensor_fault_short':
@@ -2642,93 +2376,318 @@
         case 'low_battery':
           batteryVoltage = 11.5;
           batterySocAh = 2.0;
-          logSerial('[CENARIO] Bateria em baixa tensao (11.5V).', 'warn');
-          break;
-        case 'battery_ok':
-          batteryVoltage = 12.8;
-          batterySocAh = 8.0;
-          logSerial('[CENARIO] Bateria recarregada (12.8V).', 'success');
+          logSerial('[CENARIO] Bateria Baixa aplicada (11.50V).', 'warn');
           break;
         case 'sleep_lcd':
           lastUiActivityAt = simMillis - LCD_TIMEOUT_MS - 1000;
           sleepDisplay();
-          logSerial('[CENARIO] Timeout de 30s forcado. LCD apagado.');
+          logSerial('[CENARIO] Timeout de 30s forçado. LCD em repouso.');
           break;
       }
       updateUiElements();
       renderScreen();
     }
 
-    function forceReadNow() {
-      wakeDisplay();
-      logSerial('[USUARIO] Forcando leitura de solo imediata.');
-      takeSoilReading();
-      updateUiElements();
-      renderScreen();
+    // Customizador de Hidráulica e Prateleiras
+    function updateShelfConfig(p, s) {
+      const chk = document.getElementById(`chkP${p}S${s}`);
+      const sel = document.getElementById(`selPlantP${p}S${s}`);
+      const flow = document.getElementById(`flowP${p}S${s}`);
+      const lblFlow = document.getElementById(`lblFlowP${p}S${s}`);
+
+      const flowVal = parseFloat(flow.value) / 10.0;
+      lblFlow.innerText = `${flowVal.toFixed(1)} L/h`;
+
+      shelfData[p][s].connected = chk.checked;
+      shelfData[p][s].plant = sel.value;
+      shelfData[p][s].flow = flowVal;
+
+      // Atualiza ícone da planta no jardim visual
+      const iconMap = {
+        jiboia: '🌿', samambaia: '🍃', folhagem_roxa: '🌱',
+        alface: '🥗', manjericao: '🪴', alecrim: '🌾',
+        petunia: '🌸', onze_horas: '🌼', suculenta: '🌵'
+      };
+      const plantIconEl = document.getElementById(`p${p}s${s}Icon`);
+      if (plantIconEl && iconMap[sel.value]) {
+        plantIconEl.innerText = iconMap[sel.value];
+      }
+
+      // Atualiza totais por palete
+      let pTotal = 0;
+      for (let i = 1; i <= 3; i++) {
+        if (shelfData[p][i].connected) pTotal += shelfData[p][i].flow;
+      }
+      document.getElementById(`p${p}TotalLhBadge`).innerText = `${pTotal.toFixed(1)} L/h`;
+      document.getElementById(`p${p}FlowBadge`).innerText = `${pTotal.toFixed(1)} L/h total`;
     }
 
-    // Sliders de controle livre
-    function onManualMoistureChange() {
-      soilPercent = parseInt(document.getElementById('sliderMoisture').value);
-      soilRaw = convertPercentToRaw(soilPercent);
-      document.getElementById('sliderMoistVal').innerText = `${soilPercent}% (RAW: ${soilRaw})`;
-      takeSoilReading();
+    function resetHydraulics() {
+      shelfData[1] = { 1: { plant: 'jiboia', flow: 2.0, connected: true, moist: 55 }, 2: { plant: 'samambaia', flow: 2.0, connected: true, moist: 60 }, 3: { plant: 'folhagem_roxa', flow: 2.0, connected: true, moist: 50 } };
+      shelfData[2] = { 1: { plant: 'alface', flow: 1.0, connected: true, moist: 65 }, 2: { plant: 'manjericao', flow: 1.0, connected: true, moist: 45 }, 3: { plant: 'alecrim', flow: 1.0, connected: true, moist: 40 } };
+      shelfData[3] = { 1: { plant: 'petunia', flow: 0.5, connected: true, moist: 45 }, 2: { plant: 'onze_horas', flow: 0.5, connected: true, moist: 40 }, 3: { plant: 'suculenta', flow: 0.5, connected: true, moist: 25 } };
+
+      for (let p = 1; p <= 3; p++) {
+        for (let s = 1; s <= 3; s++) {
+          const chk = document.getElementById(`chkP${p}S${s}`);
+          const flow = document.getElementById(`flowP${p}S${s}`);
+          if (chk) chk.checked = true;
+          if (flow) flow.value = shelfData[p][s].flow * 10;
+          updateShelfConfig(p, s);
+        }
+      }
     }
 
-    function onManualBatteryChange() {
-      batteryVoltage = parseInt(document.getElementById('sliderBattery').value) / 10.0;
-      document.getElementById('sliderBatVal').innerText = `${batteryVoltage.toFixed(1)} V`;
-      updateUiElements();
-      renderScreen();
-    }
-
+    // Solar Slider
     function updateSolarFromSlider() {
       solarIrradianceW = parseInt(document.getElementById('sliderSolar').value);
       updateUiElements();
     }
 
-    function onManualSunChange() {
-      solarIrradianceW = parseInt(document.getElementById('sliderSunBottom').value);
-      updateUiElements();
-    }
-
-    // Abas e Modais
-    function switchTab(tabId) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-      const content = document.getElementById(tabId);
-      if (content) content.classList.add('active');
+    // Navegação de Abas
+    function switchMainTab(tabId) {
+      document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.main-tab-btn').forEach(b => b.classList.remove('active'));
+      const view = document.getElementById(tabId);
+      if (view) view.classList.add('active');
       event.currentTarget.classList.add('active');
+      if (tabId === 'tabGardenView') drawLcdCanvas();
     }
 
-    function openModal(id) {
-      document.getElementById(id).classList.add('open');
+    // Explicações Técnicas Interativas do Esquema Elétrico
+    function showExplainer(comp) {
+      const title = document.getElementById('expTitle');
+      const body = document.getElementById('expBody');
+
+      switch (comp) {
+        case 'relay':
+          title.innerHTML = '🔌 Módulo Relé 5V com Optoacoplador PC817';
+          body.innerHTML = '<b>Função:</b> Substitui o MOSFET discreto, permitindo que o pino D9 do Arduino (5V) comande a bobina indutiva de 12V da solenóide com total <i>isolamento galvânico</i>.<br>' +
+                           '<b>Componentes da Placa:</b> Relé Songle 5Vcc (bobina consome ~70mA), optoacoplador PC817, transistor driver NPN, diodo flyback contra picos reversos e LEDs indicadores de alimentação e sinal.<br>' +
+                           '<b>Ligação:</b> VCC ➔ 5V do buck; GND ➔ GND; IN ➔ D9 do Uno; COM ➔ +12V da bateria; NO ➔ Positivo da solenóide.';
+          break;
+        case 'sensor':
+          title.innerHTML = '🌱 Sensor Resistivo de Solo + Comparador LM393 (Kit Arduino)';
+          body.innerHTML = '<b>Função:</b> Mede a condutividade elétrica do substrato entre duas trilhas de cobre (garfo).<br>' +
+                           '<b>Saída AO (Analógica):</b> Envia tensão proporcional à umidade para A0 do Arduino. Solo seco = alta resistência = valor RAW alto (~800). Solo úmido = baixa resistência = valor RAW baixo (~350).<br>' +
+                           '<b>Alerta de Corrosão Galvânica:</b> A corrente contínua direta causa eletrólise e oxidação acelerada das trilhas de cobre. <i>Solução de engenharia:</i> Alimentar o sensor pelo pino digital D8 apenas durante os 10ms da leitura, ou substituir por sonda capacitiva em campo.';
+          break;
+        case 'arduino':
+          title.innerHTML = '⚡ Microcontrolador Arduino Uno R3 (ATmega328P)';
+          body.innerHTML = '<b>Lógica de Controle:</b> Executa a máquina de estados, o debounce do botão único em D2, a automação horária de irrigação e a proteção contra descarga da bateria.<br>' +
+                           '<b>Alimentação:</b> 5,0 Vcc estabilizados provenientes do conversor buck de 12V->5V conectado aos pinos 5V e GND.';
+          break;
+        case 'solenoid':
+          title.innerHTML = '💧 Válvula Solenóide 12Vcc Normalmente Fechada (NC)';
+          body.innerHTML = '<b>Operação:</b> Em repouso (desenergizada), uma mola interna mantém a passagem de água fechada por segurança. Quando o relé fecha os contatos COM-NO, a bobina de 12V puxa o êmbolo e libera o fluxo da rede pública.<br>' +
+                           '<b>Consumo:</b> ~18 W (1,5 A @ 12V).';
+          break;
+        case 'sun21':
+          title.innerHTML = '📟 Controlador Solar SUN21 CCS-P1024 PWM 10A';
+          body.innerHTML = '<b>Gerenciamento de Carga:</b> Algoritmo de 3 estágios: Carga Bulk rápida, Absorção Boost (14,4V) e Flutuação (13,8V).<br>' +
+                           '<b>Corte LVD:</b> A proteção interna desliga cargas a 11,1V e reconecta a 12,6V. O firmware do Arduino adiciona uma proteção preventiva antecipada em 11,90V.';
+          break;
+        case 'battery':
+          title.innerHTML = '🔋 Bateria de Motocicleta 12V / 9Ah (Chumbo-Ácida)';
+          body.innerHTML = '<b>Armazenamento:</b> Capacidade teórica nominal de 108 Wh. Para prolongar a vida útil de uma bateria de partida, a descarga útil deve ser limitada a 20-30% (21,6 a 32,4 Wh).<br>' +
+                           '<b>Autonomia:</b> O consumo base da eletrônica em repouso é de apenas ~11,1 Wh/dia, garantindo autonomia de mais de 24h sem sol.';
+          break;
+        case 'divider':
+          title.innerHTML = '📐 Divisor de Tensão Resistivo 100kΩ / 33kΩ';
+          body.innerHTML = '<b>Atenuação:</b> $V_{A1} = V_{bat} \times \\frac{33k}{100k + 33k} \\approx V_{bat} / 4{,}03$.<br>' +
+                           'Uma bateria cheia a 14,4V gera apenas ~3,57V no pino A1, mantendo a leitura perfeitamente segura abaixo do limite máximo de 5,0V do conversor analógico-digital (ADC).';
+          break;
+        case 'buck':
+          title.innerHTML = '🔌 Conversor Buck Step-Down DC-DC (12V para 5.0V 2A)';
+          body.innerHTML = '<b>Eficiência:</b> Reduz os 12V flutuantes da bateria para 5,0V regulados com rendimento de ~88%, alimentando o Arduino Uno, o LCD e o módulo relé sem superaquecer.';
+          break;
+        case 'lcd':
+          title.innerHTML = '📟 Display LCD 16x2 Paralelo (HD44780)';
+          body.innerHTML = '<b>Matriz 5x8:</b> Cada caractere é formado por 40 pixels discretos organizados em 5 colunas por 8 linhas.<br>' +
+                           '<b>Economia de Energia:</b> O pino D10 comuta o transistor 2N2222 do backlight, desligando a iluminação após 30 segundos sem toques no botão.';
+          break;
+        case 'button':
+          title.innerHTML = '🔘 Botão Único Multifunção em D2';
+          body.innerHTML = '<b>INPUT_PULLUP:</b> Mantém o pino em HIGH em repouso e fecha para GND (LOW) quando pressionado.<br>' +
+                           '<b>Gestos:</b> Curto (<900ms) navega entre telas e avança valores; Longo (≥900ms) entra/sai de edição e grava na EEPROM.';
+          break;
+        case 'solar':
+          title.innerHTML = '☀️ Painel Fotovoltaico 20 Wp';
+          body.innerHTML = '<b>Geração:</b> Tensão em circuito aberto (Voc) de ~21,6V e tensão de pico (Vmp) de ~18,0V. Produz ~65 Wh/dia em condições de sol pleno moderado (~4,66 HSP).';
+          break;
+      }
     }
 
-    function closeModal(id) {
-      document.getElementById(id).classList.remove('open');
+    // Código Padrão com Suporte ao Relé
+    const DEFAULT_SKETCH = `/*
+  HORTA VERTICAL AUTÔNOMA - Arduino UNO R3
+  Atualizado com MÓDULO RELÉ 5V e SENSOR RESISTIVO LM393 DO KIT
+*/
+
+#include <LiquidCrystal.h>
+#include <EEPROM.h>
+
+// PINOS
+const byte PIN_BUTTON        = 2;   // Botao D2 para GND (INPUT_PULLUP)
+const byte PIN_LCD_RS        = 12;
+const byte PIN_LCD_EN        = 11;
+const byte PIN_LCD_D4        = 5;
+const byte PIN_LCD_D5        = 4;
+const byte PIN_LCD_D6        = 3;
+const byte PIN_LCD_D7        = 6;
+const byte PIN_LCD_BACKLIGHT = 10;  // Transistor 2N2222 do Backlight
+const byte PIN_RELAY         = 9;   // IN do Modulo Rele 5V (Solenoide 12V)
+const byte PIN_SOIL          = A0;  // AO do Sensor LM393 do Kit
+const byte PIN_BATTERY       = A1;  // Divisor 100k / 33k da Bateria
+
+// Modulos rele comuns: true = LOW ativa o rele, false = HIGH ativa
+const bool RELAY_ACTIVE_LOW = false; 
+
+LiquidCrystal lcd(PIN_LCD_RS, PIN_LCD_EN, PIN_LCD_D4, PIN_LCD_D5, PIN_LCD_D6, PIN_LCD_D7);
+
+// CALIBRACAO SENSOR KIT LM393
+const int SOIL_DRY_RAW = 800;  // Leitura analogica solo seco
+const int SOIL_WET_RAW = 350;  // Leitura analogica solo umido
+const float BATTERY_CUTOFF_V = 11.90; // Bloqueio preventivo de nova irrigacao
+
+struct UserConfig {
+  uint16_t magic;
+  uint8_t humidityLimit;
+  uint8_t intervalHours;
+  uint16_t valveSeconds;
+};
+
+UserConfig config;
+
+void setup() {
+  pinMode(PIN_BUTTON, INPUT_PULLUP);
+  pinMode(PIN_RELAY, OUTPUT);
+  pinMode(PIN_LCD_BACKLIGHT, OUTPUT);
+
+  // Desliga o rele inicialmente por seguranca
+  digitalWrite(PIN_RELAY, RELAY_ACTIVE_LOW ? HIGH : LOW);
+  digitalWrite(PIN_LCD_BACKLIGHT, HIGH);
+
+  Serial.begin(9600);
+  lcd.begin(16, 2);
+  lcd.print("HORTA AUTONOMA");
+  lcd.setCursor(0, 1);
+  lcd.print("Iniciando...");
+
+  config.humidityLimit = 45;
+  config.intervalHours = 1;
+  config.valveSeconds = 30;
+}
+
+void loop() {
+  // O loop gerencia o botao, leitura do solo e rele da valvula
+}
+`;
+
+    function loadEditorCode() {
+      const area = document.getElementById('codeTextarea');
+      area.value = DEFAULT_SKETCH;
+      updateLineNumbers();
     }
 
-    // Atalhos de Teclado (Barra de Espaço = Pressionar Botão)
+    function updateLineNumbers() {
+      const area = document.getElementById('codeTextarea');
+      const lines = area.value.split('\n').length;
+      let nums = '';
+      for (let i = 1; i <= lines; i++) {
+        nums += i + '\n';
+      }
+      document.getElementById('codeLineNumbers').innerText = nums;
+    }
+
+    function compileAndRunCode() {
+      const out = document.getElementById('compilerOutput');
+      const code = document.getElementById('codeTextarea').value;
+
+      out.innerHTML = '<span style="color:#fbbf24;">[AVR-GCC] Compilando sketch horta_vertical_rele.ino...</span><br>';
+
+      setTimeout(() => {
+        // Tenta extrair variáveis do código digitado
+        const dryMatch = code.match(/SOIL_DRY_RAW\s*=\s*(\d+)/);
+        const wetMatch = code.match(/SOIL_WET_RAW\s*=\s*(\d+)/);
+        const batMatch = code.match(/BATTERY_CUTOFF_V\s*=\s*([\d.]+)/);
+        const humMatch = code.match(/humidityLimit\s*=\s*(\d+)/);
+        const intMatch = code.match(/intervalHours\s*=\s*(\d+)/);
+        const vlvMatch = code.match(/valveSeconds\s*=\s*(\d+)/);
+
+        if (dryMatch) SOIL_DRY_RAW = parseInt(dryMatch[1]);
+        if (wetMatch) SOIL_WET_RAW = parseInt(wetMatch[1]);
+        if (batMatch) BATTERY_CUTOFF_V = parseFloat(batMatch[1]);
+        if (humMatch) config.humidityLimit = parseInt(humMatch[1]);
+        if (intMatch) config.intervalHours = parseInt(intMatch[1]);
+        if (vlvMatch) config.valveSeconds = parseInt(vlvMatch[1]);
+
+        out.innerHTML += '<span style="color:#4ade80;">[OK] Compilação bem-sucedida!</span><br>' +
+                         `Memória Flash usada: 4.820 bytes (14% de 32.256 bytes).<br>` +
+                         `SRAM usada: 312 bytes (15% de 2.048 bytes).<br>` +
+                         `<span style="color:#38bdf8;">[AVRDUDE] Gravado no Arduino Uno R3 via USB serial.</span>`;
+
+        logSerial('[COMPILADOR] Novo firmware compilado e carregado no Arduino.');
+        updateUiElements();
+        renderScreen();
+      }, 300);
+    }
+
+    function resetDefaultCode() {
+      document.getElementById('codeTextarea').value = DEFAULT_SKETCH;
+      updateLineNumbers();
+      document.getElementById('compilerOutput').innerText = '[AVR-GCC] Código padrão restaurado.';
+    }
+
+    function copyEditorCode() {
+      const code = document.getElementById('codeTextarea').value;
+      navigator.clipboard.writeText(code).then(() => {
+        alert('Código copiado para a área de transferência!');
+      });
+    }
+
+    function quickTuneVar(name, val) {
+      if (name === 'hum') {
+        config.humidityLimit = parseInt(val);
+        document.getElementById('lblCfgHum').innerText = `${val}%`;
+      } else if (name === 'int') {
+        config.intervalHours = parseInt(val);
+        document.getElementById('lblCfgInt').innerText = `${val} h`;
+      } else if (name === 'vlv') {
+        config.valveSeconds = parseInt(val);
+        document.getElementById('lblCfgVlv').innerText = `${val} s`;
+      } else if (name === 'bat') {
+        BATTERY_CUTOFF_V = parseFloat(val);
+        document.getElementById('lblCfgBat').innerText = `${parseFloat(val).toFixed(2)} V`;
+      } else if (name === 'relayLogic') {
+        RELAY_ACTIVE_LOW = (val === 'LOW');
+        logSerial(`[CONFIG] Logica do Rele ajustada: Ativo em ${val}`);
+      }
+      renderScreen();
+    }
+
+    // Inicialização ao carregar página
+    window.addEventListener('DOMContentLoaded', () => {
+      loadEditorCode();
+      resetHydraulics();
+      resetSystem();
+      drawLcdCanvas();
+      requestAnimationFrame(loop);
+    });
+
+    // Tecla espaço aciona botão D2
     window.addEventListener('keydown', (e) => {
-      if (e.code === 'Space' && !e.repeat && e.target.tagName !== 'INPUT') {
+      if (e.code === 'Space' && !e.repeat && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'INPUT') {
         e.preventDefault();
         btnDown();
       }
     });
 
     window.addEventListener('keyup', (e) => {
-      if (e.code === 'Space' && e.target.tagName !== 'INPUT') {
+      if (e.code === 'Space' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'INPUT') {
         e.preventDefault();
         btnUp();
       }
-    });
-
-    // Inicialização ao Carregar
-    window.addEventListener('DOMContentLoaded', () => {
-      loadConfig();
-      resetSystem();
-      requestAnimationFrame(loop);
     });
   </script>
 </body>
